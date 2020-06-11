@@ -1,0 +1,13 @@
+<svg xmlns='http://www.w3.org/2000/svg' 
+xmlns:xlink='http://www.w3.org/1999/xlink' 
+viewBox = '-14 -14 27 27' >
+<path d = '
+	M -2, -6
+	L 0, -4
+	L 1, -2
+	L 1, 1
+	L 0, 3
+	L -2, 5
+
+' fill='none' stroke='black' />
+</svg>

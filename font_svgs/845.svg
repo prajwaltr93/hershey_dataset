@@ -1,0 +1,12 @@
+<svg xmlns='http://www.w3.org/2000/svg' 
+xmlns:xlink='http://www.w3.org/1999/xlink' 
+viewBox = '-17 -17 34 34' >
+<path d = '
+	M 0, -7
+	L 0, 7
+
+	M -7, 0
+	L 7, 0
+
+' fill='none' stroke='black' />
+</svg>
