@@ -52,9 +52,6 @@ fd = open("hershey.jhf","r")
 
 for raw_line in fd:
 
-    if thresh == 500:
-        break
-
     #print(f"ascii {raw_line[:6]} vertices {raw_line[6:8]} rest {raw_line[8:]}")
     line_number = int(raw_line[:6].strip())
     vertices = int(raw_line[6:8].strip())
@@ -88,4 +85,4 @@ for raw_line in fd:
     fd.write("' fill='none' stroke='black' />\n")
     fd.write("</svg>")
     fd.close()
-    thresh += 1
+    
