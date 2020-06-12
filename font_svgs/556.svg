@@ -1,0 +1,34 @@
+<svg xmlns='http://www.w3.org/2000/svg' 
+xmlns:xlink='http://www.w3.org/1999/xlink' 
+viewBox = '-20 -20 40 40' >
+<path d = '
+	M 0, -6
+	L -2, -6
+	L -4, -7
+	L -5, -9
+	L -4, -11
+	L -1, -12
+	L 2, -12
+	L 6, -11
+	L 9, -11
+	L 11, -12
+
+	M 6, -11
+	L 4, -4
+	L 2, 2
+	L 0, 6
+	L -2, 8
+	L -4, 9
+	L -6, 9
+	L -8, 8
+	L -9, 6
+	L -9, 4
+	L -8, 3
+	L -6, 3
+	L -4, 4
+
+	M -1, -2
+	L 8, -2
+
+' fill='none' stroke='black' />
+</svg>
