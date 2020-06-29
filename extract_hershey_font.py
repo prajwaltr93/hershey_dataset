@@ -16,6 +16,7 @@
 R = ord('R')
 padding = 1
 left_line = 0
+scale = 10
 svg_start_line = "<svg xmlns='http://www.w3.org/2000/svg' \nxmlns:xlink='http://www.w3.org/1999/xlink' \n"
 m_line = "\tM %s, %s\n"
 l_line = "\tL %s, %s\n"
@@ -23,7 +24,7 @@ l_line = "\tL %s, %s\n"
 #helper functions
 def ord_string(parse_res):
     #print(parse_res)
-    return ord(parse_res[0]) - left_line, ord(parse_res[1]) - left_line + padding
+    return (ord(parse_res[0]) - left_line) * scale, (ord(parse_res[1]) - left_line + padding) * scale
 
 def parse_command(flag,command):
     parse_pointer = 0
@@ -74,7 +75,7 @@ for raw_line in fd:
     right_line = ord(commands[0][1])
     width = right_line - left_line
     print(left_line,right_line,width)
-    fd.write(f"viewBox = \'{0} {0} {width} {width + padding}\' >\n")
+    fd.write(f"viewBox = \'{0} {0} {width * scale} {(width + padding) * scale}\' >\n")
     fd.write("<path d = '\n")
     #print(width,left_line,right_line)
     #remove characters containing metrics
@@ -91,4 +92,4 @@ for raw_line in fd:
     fd.write("' fill='none' stroke='black' />\n")
     fd.write("</svg>")
     fd.close()
-    thresh += 1
+    thresh += 10
