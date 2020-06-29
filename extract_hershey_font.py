@@ -14,7 +14,8 @@
 '''
 #constants
 R = ord('R')
-padding = 10
+padding = 1
+left_line = 0
 svg_start_line = "<svg xmlns='http://www.w3.org/2000/svg' \nxmlns:xlink='http://www.w3.org/1999/xlink' \n"
 m_line = "\tM %s, %s\n"
 l_line = "\tL %s, %s\n"
@@ -22,7 +23,7 @@ l_line = "\tL %s, %s\n"
 #helper functions
 def ord_string(parse_res):
     #print(parse_res)
-    return ord(parse_res[0]) - R, ord(parse_res[1]) - R
+    return ord(parse_res[0]) - left_line, ord(parse_res[1]) - left_line + padding
 
 def parse_command(flag,command):
     parse_pointer = 0
@@ -34,6 +35,7 @@ def parse_command(flag,command):
     #process R or start drawing ex M x,y
     parse_res = command[parse_pointer:parse_pointer+2]
     fd.write(m_line % ord_string(parse_res))
+    print(m_line % ord_string(parse_res))
     parse_pointer += 2
 
     #recursively extract command
@@ -45,12 +47,16 @@ def parse_command(flag,command):
             parse_res = command[parse_pointer:parse_pointer+2]
 
         fd.write(l_line % ord_string(parse_res))
+        print(l_line % ord_string(parse_res))
         parse_pointer += 2
 
 thresh = 0
 fd = open("hershey.jhf","r")
 
 for raw_line in fd:
+
+    if thresh == 1:
+        break
 
     #print(f"ascii {raw_line[:6]} vertices {raw_line[6:8]} rest {raw_line[8:]}")
     line_number = int(raw_line[:6].strip())
@@ -67,8 +73,8 @@ for raw_line in fd:
     left_line = ord(commands[0][0])
     right_line = ord(commands[0][1])
     width = right_line - left_line
-    #print(left_line - R,right_line - R,width)
-    fd.write(f"viewBox = \'{left_line - R - padding} {left_line - R - padding} {width + padding + 10} {width + padding + 10}\' >\n")
+    print(left_line,right_line,width)
+    fd.write(f"viewBox = \'{0} {0} {width} {width + padding}\' >\n")
     fd.write("<path d = '\n")
     #print(width,left_line,right_line)
     #remove characters containing metrics
@@ -85,4 +91,4 @@ for raw_line in fd:
     fd.write("' fill='none' stroke='black' />\n")
     fd.write("</svg>")
     fd.close()
-    
+    thresh += 1
