@@ -8,7 +8,7 @@ Tool to extract svg's from hershey's font definition, dataset of already extract
 
 ./hershey.jhf               original file by Dr. Hershey contains all characters
 
-./svg_to_png 		    convert svg_files to png_files
+./svg_to_png.py 	    convert svg_files to png_files
 
 This dataset was inspired from paper :
 
@@ -27,4 +27,5 @@ Original paper was based on japanese characters, you can also extract the same u
 ### TODO : 
 
 [ ] create a complete dataset of action lines and other information for training both global and local model
+
 [ ] create a pickled form of dataset 
