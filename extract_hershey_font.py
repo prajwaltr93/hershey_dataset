@@ -12,11 +12,13 @@
     which is then generalised to english and other languages. this dataset is created to be used for training purposes.
     feel free to use and report any issues
 '''
-#constants
+#constants and magic numbers
 R = ord('R')
-padding = 1
-left_line = 0
-scale = 10
+min_x = -35
+min_y = -50
+max_x = 20
+max_y = 45
+
 svg_start_line = "<svg xmlns='http://www.w3.org/2000/svg' \nxmlns:xlink='http://www.w3.org/1999/xlink' \n"
 m_line = "\tM %s, %s\n"
 l_line = "\tL %s, %s\n"
@@ -24,7 +26,7 @@ l_line = "\tL %s, %s\n"
 #helper functions
 def ord_string(parse_res):
     #print(parse_res)
-    return (ord(parse_res[0]) - left_line) * scale, (ord(parse_res[1]) - left_line + padding) * scale
+    return (ord(parse_res[0]) - R - min_x), (ord(parse_res[1]) - R - min_y)
 
 def parse_command(flag,command):
     parse_pointer = 0
@@ -56,9 +58,6 @@ fd = open("hershey.jhf","r")
 
 for raw_line in fd:
 
-    if thresh == 1:
-        break
-
     #print(f"ascii {raw_line[:6]} vertices {raw_line[6:8]} rest {raw_line[8:]}")
     line_number = int(raw_line[:6].strip())
     vertices = int(raw_line[6:8].strip())
@@ -75,7 +74,7 @@ for raw_line in fd:
     right_line = ord(commands[0][1])
     width = right_line - left_line
     print(left_line,right_line,width)
-    fd.write(f"viewBox = \'{0} {0} {width * scale} {(width + padding) * scale}\' >\n")
+    fd.write(f"viewBox = \'{min_x - min_x} {min_y - min_y} {max_x - min_x} {max_y - min_y}\' >\n")
     fd.write("<path d = '\n")
     #print(width,left_line,right_line)
     #remove characters containing metrics
@@ -92,4 +91,4 @@ for raw_line in fd:
     fd.write("' fill='none' stroke='black' />\n")
     fd.write("</svg>")
     fd.close()
-    thresh += 10
+    thresh += 1
