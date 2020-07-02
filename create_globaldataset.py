@@ -38,27 +38,13 @@ from os import walk
 
 #globals
 path_re = re.compile(r'\t(.*)\n')
-
+points_re = re.compile(r'(\d+),\s(\d+)')
 traverse_path = "./font_svgs/"
 
-#point class
-
-class point:
-    '''
-    class to represent simple point
-    '''
-    def __init__(self, x = None, y = None):
-        if x == None and y ==  None:
-            self.x = 0
-            self.y = 0
-        else:
-            self.x = x
-            self.y = y
-    def updatePoint(self, point_string):
-        #update X_loc
-        points = parsePointString(point_string)
-        self.x = points[0]
-        self.y = points[1]
+def parsePointString(point_string):
+    #get x and y cordinate out of point_string
+    result_points = path_re.search(point_string)
+    return int(result_points.group[1]), int(result_points.grop[2])
 
 def drawPoint(point):
     '''
@@ -95,21 +81,42 @@ def updateStroke(flag, path_remaining):
     '''
     pass
 
-def getStrokes(stroke_string):
+def getStrokesIndices(svg_string):
     #get path string
-    paths = path_re.findall(stroke_string)
-    processed_paths = []
+    paths = path_re.findall(svg_string)
+    m_indices = []
+    print(paths)
     for path in paths:
+        if path[0] == 'M':
+            m_indices.append(paths.index(path))
+    return m_indices
 
+#point class
+class point:
+    '''
+    class to represent simple point
+    '''
+    def __init__(self, x = None, y = None):
+        if x == None and y ==  None:
+            self.x = 0
+            self.y = 0
+        else:
+            self.x = x
+            self.y = y
+
+    def updatePoint(self, point_string):
+        #update X_loc
+        self.x, self.y =  parsePointString(point_string)
 
 if __name__ == "__main__":
-
+    thresh = 0
     #main loop
-    for _, _, filelist in walk(traver_path):
+    for _, _, filelist in walk(traverse_path):
         for file in filelist:
+            if thresh == 5:
+                break
             svg_string = open(traverse_path+file,"r").read()
-            paths = getStrokes(svg_string)
-            print(svg_string)
+            m_indices = getStrokesIndices(svg_string)
             print(file)
-            print(paths)
-            break
+            print(m_indices)
+            thresh += 1
