@@ -86,9 +86,9 @@ def getStrokesIndices(svg_string):
     paths = path_re.findall(svg_string)
     m_indices = []
     print(paths)
-    for path in paths:
+    for search_ind, path in zip(range(len(paths)),paths.__iter__()):
         if path[0] == 'M':
-            m_indices.append(paths.index(path))
+            m_indices.append(search_ind)
     return m_indices
 
 #point class
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     #main loop
     for _, _, filelist in walk(traverse_path):
         for file in filelist:
-            if thresh == 5:
+            if thresh == 2:
                 break
             svg_string = open(traverse_path+file,"r").read()
             m_indices = getStrokesIndices(svg_string)
