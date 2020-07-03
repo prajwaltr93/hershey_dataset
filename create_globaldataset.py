@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!~/opencvprjects/bin/python3
 
 #filename : create_globaldataset.py
 #author : PRAJWAL T R
@@ -35,18 +35,23 @@
 
 import re
 from os import walk
+import numpy as np
+import cv2 as cv
 
 #globals
+WIDTH = 55
+HEIGHT = 95
+CHANNELS = 3
 path_re = re.compile(r'\t(.*)\n')
 points_re = re.compile(r'(\d+),\s(\d+)')
 traverse_path = "./font_svgs/"
 
 def parsePointString(point_string):
     #get x and y cordinate out of point_string
-    result_points = path_re.search(point_string)
+    result_points = points_re.search(point_string)
     return int(result_points.group[1]), int(result_points.grop[2])
 
-def drawPoint(point):
+def drawPoint(point = None):
     '''
         point : list of x,y
         if point == Nan:
@@ -54,8 +59,16 @@ def drawPoint(point):
         else:
             mark point in white color ex : for argmax
             background in black
+        returns numpy representation of images
     '''
-    pass
+    img = np.ones((HEIGHT,WIDTH,CHANNELS)) * 255
+    if point == None:
+        #generate black background image
+        return img
+    else:
+        #mark white dot
+        img[point.x][point.y] = [0, 0, 0]
+    return img
 
 def drawStroke(stroke):
     '''
@@ -68,31 +81,21 @@ def drawStroke(stroke):
 
         if stroke == Nan
             generate empty image
-    '''
-    pass
-
-def updateStroke(flag, path_remaining):
-    '''
-        flags :
-        1 - update stroke complete
-        2 - udpate prev_stroke
-        3 - update remaining stroke
-
+        returns numpy representation of images
     '''
     pass
 
 def getStrokesIndices(svg_string):
     #get path string
-    paths = path_re.findall(svg_string)
+    X_target = path_re.findall(svg_string)
     m_indices = []
-    print(paths)
     for search_ind, path in zip(range(len(paths)),paths.__iter__()):
         if path[0] == 'M':
             m_indices.append(search_ind)
-    return m_indices
+    return paths, m_indices
 
 #point class
-class point:
+class Point:
     '''
     class to represent simple point
     '''
@@ -113,10 +116,29 @@ if __name__ == "__main__":
     #main loop
     for _, _, filelist in walk(traverse_path):
         for file in filelist:
-            if thresh == 2:
+            if thresh == 1:
                 break
             svg_string = open(traverse_path+file,"r").read()
-            m_indices = getStrokesIndices(svg_string)
-            print(file)
-            print(m_indices)
+            X_target, m_indices = getStrokesIndices(svg_string)
+            #last point of local model
+            X_loc = Point()
+            #strokes completed by local model
+            X_env = []
+            #last stroke drawn by local model
+            X_last = []
+            #remaining strokes to complete
+            X_diff = X_target
+            #target label
+            label = Point()
+            #creating images and labels
+            for index, m_index in zip(range(len(m_indices)),m_indices.__iter__()):
+                #each function call generates corresponding image
+                X_loc_img = drawPoint(X_loc)
+                X_env_img = drawStroke(X_env)
+                X_last_img =  drawStroke(X_last)
+                X_diff_img = drawStroke(X_diff)
+                label.updatePoint(X_target[index + 1])
+
+                #udpate variables
+
             thresh += 1
