@@ -14,7 +14,7 @@
 '''
 #constants and magic numbers
 R = ord('R')
-min_x = -35
+min_x = -40
 min_y = -50
 max_x = 20
 max_y = 45
