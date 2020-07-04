@@ -10,17 +10,16 @@
 
     dataset structure :
         dataset : {
-            sG_data : {
+            sG_data : [
                 [[X_loc],[X_env],[X_last],[X_diff]] ,
                 ... ,
                 ... ,
-            } ,
-            sG_labels : {
+            ] ,
+            sG_labels : [
                 [x, y],
                 ... ,
                 ... ,
-            }
-
+            ]
         }
 
     //end of structure
@@ -38,9 +37,10 @@ from os import walk
 import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
+import pickle as pic
 
 #globals
-WIDTH = 55
+WIDTH = 60
 HEIGHT = 95
 CHANNELS = 3
 COLOR = (1, 1, 1)
@@ -49,7 +49,13 @@ LINE_TYPE = cv.LINE_AA
 path_re = re.compile(r'\t(.*)\n')
 points_re = re.compile(r'(\d+),\s(\d+)')
 traverse_path = "./font_svgs/"
+global_dataset_path = "./global_dataset/"
 
+#dataset structure
+dataset = {
+    "sG_data" : [],
+    "sG_labels" : []
+}
 #debug functions
 def showImage(img):
     cv.imshow("show window",img)
@@ -68,6 +74,13 @@ def plotImages(ind, X_loc_img, X_env_img, X_last_img, X_diff_img):
     axs[3].imshow(X_diff_img)
     axs[3].set_title("X_diff_img")
     plt.savefig("mygraph"+ind+".png")
+
+def pickleDataset(dataset,ind):
+    fd = open(global_dataset_path+"data_batch_"+str(ind),"wb")
+    pic.dump(dataset,fd)
+    #clear contents of dataset structure
+    dataset['sG_data'] = []
+    dataset['sG_labels'] = []
 
 def parsePointString(point_string):
     #get x and y cordinate out of point_string
@@ -152,44 +165,47 @@ class Point:
         points = parsePointString(point_string)
         self.x = points[0]
         self.y = points[1]
+    def __str__(self):
+        return "X : {} Y : {}\n".format(self.x, self.y)
 
 if __name__ == "__main__":
-    thresh = 0
     #main loop
-    for _, _, filelist in walk(traverse_path):
-        for file in filelist:
-            if thresh == 1:
-                break
-            svg_string = open("./font_svgs/744.svg").read()
-            X_target, m_indices = getStrokesIndices(svg_string)
-            #last point of local model
-            X_loc = Point()
-            #strokes completed by local model
-            X_env = []
-            #last stroke drawn by local model
-            X_last = []
-            #remaining strokes to complete
-            X_diff = X_target
-            #target label
-            label = Point()
-            label.updatePoint(X_target[0])
-            #creating images and labels
-            for index, m_index in zip(range(len(m_indices)),m_indices.__iter__()):
-                #each function call generates corresponding image
-                X_loc_img = drawPoint(X_loc)
-                X_env_img = drawStroke(X_env)
-                X_last_img = drawStroke(X_last)
-                X_diff_img = drawStroke(X_diff)
-                plotImages(str(index), X_loc_img, X_env_img, X_last_img, X_diff_img)
-                #udpate variables
-                if (len(m_indices) == 1) or (index + 1 == len(m_indices)):
-                    #X_target has only one stroke
-                    continue
-                X_loc.updatePoint(X_target[m_indices[index + 1] - 1])
-                X_env += X_target[m_indices[index] : m_indices[index + 1]]
-                X_last = X_target[m_indices[index] : m_indices[index + 1]]
-                X_diff = X_target[m_indices[index + 1]:]
-
-                #write to datastructure
-
-            thresh += 1
+    thresh = 0
+    breaks = [0, 300, 600, 900, 1200, 1569]
+    for break_ind in range(len(breaks) - 1):
+        for _, _, filelist in walk(traverse_path):
+            for file in filelist[breaks[break_ind] : breaks[break_ind + 1]]:
+                svg_string = open(traverse_path+file).read()
+                X_target, m_indices = getStrokesIndices(svg_string)
+                #last point of local model
+                X_loc = Point()
+                #strokes completed by local model
+                X_env = []
+                #last stroke drawn by local model
+                X_last = []
+                #remaining strokes to complete
+                X_diff = X_target
+                #target label
+                label = Point()
+                label.updatePoint(X_target[0])
+                #creating images and labels
+                for index, m_index in zip(range(len(m_indices)),m_indices.__iter__()):
+                    #each function call generates corresponding image
+                    X_loc_img = drawPoint(X_loc)
+                    X_env_img = drawStroke(X_env)
+                    X_last_img = drawStroke(X_last)
+                    X_diff_img = drawStroke(X_diff)
+                    #plotImages(str(index), X_loc_img, X_env_img, X_last_img, X_diff_img)
+                    #update to dataset
+                    dataset['sG_data'].append([X_loc_img, X_env_img, X_last_img, X_diff_img])
+                    dataset['sG_labels'].append([label.x, label.y])
+                    #udpate variables
+                    if (len(m_indices) == 1) or (index + 1 == len(m_indices)):
+                        #X_target has only one stroke
+                        continue
+                    X_loc.updatePoint(X_target[m_indices[index + 1] - 1])
+                    X_env += X_target[m_indices[index] : m_indices[index + 1]]
+                    X_last = X_target[m_indices[index] : m_indices[index + 1]]
+                    X_diff = X_target[m_indices[index + 1]:]
+                    label.updatePoint(X_target[m_indices[index + 1]])
+            pickleDataset(dataset,break_ind)
