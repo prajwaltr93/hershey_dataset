@@ -1,4 +1,4 @@
-#!~/opencvprjects/bin/python3
+#!/home/starkm42/opencvprjcts/bin/python3
 
 #filename : create_globaldataset.py
 #author : PRAJWAL T R
@@ -37,19 +37,42 @@ import re
 from os import walk
 import numpy as np
 import cv2 as cv
+import matplotlib.pyplot as plt
 
 #globals
 WIDTH = 55
 HEIGHT = 95
 CHANNELS = 3
+COLOR = (1, 1, 1)
+THICKNESS = 1
+LINE_TYPE = cv.LINE_AA
 path_re = re.compile(r'\t(.*)\n')
 points_re = re.compile(r'(\d+),\s(\d+)')
 traverse_path = "./font_svgs/"
 
+#debug functions
+def showImage(img):
+    cv.imshow("show window",img)
+    cv.imwrite("debug_image_out.png",img)
+    cv.waitKey(0)
+
+#helper functions
+def plotImages(ind, X_loc_img, X_env_img, X_last_img, X_diff_img):
+    fig, axs = plt.subplots(1,4)
+    axs[0].imshow(X_loc_img)
+    axs[0].set_title("X_loc_img")
+    axs[1].imshow(X_env_img)
+    axs[1].set_title("X_env_img")
+    axs[2].imshow(X_last_img)
+    axs[2].set_title("X_last_img")
+    axs[3].imshow(X_diff_img)
+    axs[3].set_title("X_diff_img")
+    plt.savefig("mygraph"+ind+".png")
+
 def parsePointString(point_string):
     #get x and y cordinate out of point_string
     result_points = points_re.search(point_string)
-    return int(result_points.group[1]), int(result_points.grop[2])
+    return (int(result_points.group(1)), int(result_points.group(2)))
 
 def drawPoint(point = None):
     '''
@@ -61,16 +84,16 @@ def drawPoint(point = None):
             background in black
         returns numpy representation of images
     '''
-    img = np.ones((HEIGHT,WIDTH,CHANNELS)) * 255
-    if point == None:
+    img = np.zeros((HEIGHT,WIDTH,CHANNELS))
+    if point.x == 0 and point.y == 0:
         #generate black background image
         return img
     else:
         #mark white dot
-        img[point.x][point.y] = [0, 0, 0]
+        img[point.y][point.x] = [255, 255, 255]
     return img
 
-def drawStroke(stroke):
+def drawStroke(strokes):
     '''
         stroke
             ex :
@@ -83,16 +106,33 @@ def drawStroke(stroke):
             generate empty image
         returns numpy representation of images
     '''
-    pass
+    img = np.zeros((HEIGHT,WIDTH,CHANNELS))
+    if len(strokes) == 0:
+        #generate empty image
+        return img
+    #X_last X_env X_diff
+    m_indices = []
+    for search_ind, path in zip(range(len(strokes)), strokes.__iter__()):
+        if path[0] == 'M':
+            m_indices.append(search_ind)
+    for ind in range(len(m_indices) - 1):
+        slice = strokes[m_indices[ind] : m_indices[ind + 1]]
+        for ind in range(len(slice) - 1):
+            cv.line(img,parsePointString(slice[ind]),parsePointString(slice[ind+1]),COLOR,THICKNESS,LINE_TYPE)
+    #for length of m_indices = 1 and drawing end strokes
+    slice = strokes[m_indices[-1] : ]
+    for ind in range(len(slice) - 1):
+        cv.line(img,parsePointString(slice[ind]),parsePointString(slice[ind+1]),COLOR,THICKNESS,LINE_TYPE)
+    return img
 
 def getStrokesIndices(svg_string):
     #get path string
     X_target = path_re.findall(svg_string)
     m_indices = []
-    for search_ind, path in zip(range(len(paths)),paths.__iter__()):
+    for search_ind, path in zip(range(len(X_target)),X_target.__iter__()):
         if path[0] == 'M':
             m_indices.append(search_ind)
-    return paths, m_indices
+    return X_target, m_indices
 
 #point class
 class Point:
@@ -109,7 +149,9 @@ class Point:
 
     def updatePoint(self, point_string):
         #update X_loc
-        self.x, self.y =  parsePointString(point_string)
+        points = parsePointString(point_string)
+        self.x = points[0]
+        self.y = points[1]
 
 if __name__ == "__main__":
     thresh = 0
@@ -118,7 +160,7 @@ if __name__ == "__main__":
         for file in filelist:
             if thresh == 1:
                 break
-            svg_string = open(traverse_path+file,"r").read()
+            svg_string = open("./font_svgs/744.svg").read()
             X_target, m_indices = getStrokesIndices(svg_string)
             #last point of local model
             X_loc = Point()
@@ -130,15 +172,24 @@ if __name__ == "__main__":
             X_diff = X_target
             #target label
             label = Point()
+            label.updatePoint(X_target[0])
             #creating images and labels
             for index, m_index in zip(range(len(m_indices)),m_indices.__iter__()):
                 #each function call generates corresponding image
                 X_loc_img = drawPoint(X_loc)
                 X_env_img = drawStroke(X_env)
-                X_last_img =  drawStroke(X_last)
+                X_last_img = drawStroke(X_last)
                 X_diff_img = drawStroke(X_diff)
-                label.updatePoint(X_target[index + 1])
-
+                plotImages(str(index), X_loc_img, X_env_img, X_last_img, X_diff_img)
                 #udpate variables
+                if (len(m_indices) == 1) or (index + 1 == len(m_indices)):
+                    #X_target has only one stroke
+                    continue
+                X_loc.updatePoint(X_target[m_indices[index + 1] - 1])
+                X_env += X_target[m_indices[index] : m_indices[index + 1]]
+                X_last = X_target[m_indices[index] : m_indices[index + 1]]
+                X_diff = X_target[m_indices[index + 1]:]
+
+                #write to datastructure
 
             thresh += 1
