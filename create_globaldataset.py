@@ -43,7 +43,7 @@ import pickle as pic
 WIDTH = 60
 HEIGHT = 95
 CHANNELS = 3
-COLOR = (1, 1, 1)
+COLOR = [1, 1, 1]
 THICKNESS = 1
 LINE_TYPE = cv.LINE_AA
 path_re = re.compile(r'\t(.*)\n')
@@ -103,7 +103,7 @@ def drawPoint(point = None):
         return img
     else:
         #mark white dot
-        img[point.y][point.x] = [255, 255, 255]
+        img[point.y][point.x] = COLOR
     return img
 
 def drawStroke(strokes):
@@ -195,10 +195,11 @@ if __name__ == "__main__":
                     X_env_img = drawStroke(X_env)
                     X_last_img = drawStroke(X_last)
                     X_diff_img = drawStroke(X_diff)
+                    X_label_img = drawPoint(label)
                     #plotImages(str(index), X_loc_img, X_env_img, X_last_img, X_diff_img)
                     #update to dataset
                     dataset['sG_data'].append([X_loc_img, X_env_img, X_last_img, X_diff_img])
-                    dataset['sG_labels'].append([label.x, label.y])
+                    dataset['sG_labels'].append(X_label_img)
                     #udpate variables
                     if (len(m_indices) == 1) or (index + 1 == len(m_indices)):
                         #X_target has only one stroke
