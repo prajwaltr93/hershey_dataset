@@ -1,3 +1,5 @@
 **/font_svgs/
 **/font_pngs/
 **/*.png
+**/global_dataset/
+.gitignore

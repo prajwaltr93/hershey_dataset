@@ -42,8 +42,7 @@ import pickle as pic
 #globals
 WIDTH = 60
 HEIGHT = 95
-CHANNELS = 3
-COLOR = [1, 1, 1]
+COLOR = 1
 THICKNESS = 1
 LINE_TYPE = cv.LINE_AA
 path_re = re.compile(r'\t(.*)\n')
@@ -97,7 +96,7 @@ def drawPoint(point = None):
             background in black
         returns numpy representation of images
     '''
-    img = np.zeros((HEIGHT,WIDTH,CHANNELS))
+    img = np.zeros((HEIGHT,WIDTH))
     if point.x == 0 and point.y == 0:
         #generate black background image
         return img
@@ -119,7 +118,7 @@ def drawStroke(strokes):
             generate empty image
         returns numpy representation of images
     '''
-    img = np.zeros((HEIGHT,WIDTH,CHANNELS))
+    img = np.zeros((HEIGHT,WIDTH))
     if len(strokes) == 0:
         #generate empty image
         return img
@@ -210,3 +209,4 @@ if __name__ == "__main__":
                     X_diff = X_target[m_indices[index + 1]:]
                     label.updatePoint(X_target[m_indices[index + 1]])
             pickleDataset(dataset,break_ind)
+        break
