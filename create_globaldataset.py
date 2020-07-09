@@ -76,6 +76,9 @@ def plotImages(ind, X_loc_img, X_env_img, X_last_img, X_diff_img):
 
 def pickleDataset(dataset,ind):
     fd = open(global_dataset_path+"data_batch_"+str(ind),"wb")
+    #convert list to numpy array ie : compatiable with tensorflow adapter
+    dataset['sG_data'] = np.array(dataset['sG_data'])
+    dataset['sG_labels'] = np.array(dataset['sG_labels'])
     pic.dump(dataset,fd)
     #clear contents of dataset structure
     dataset['sG_data'] = []
@@ -166,6 +169,8 @@ class Point:
         self.y = points[1]
     def __str__(self):
         return "X : {} Y : {}\n".format(self.x, self.y)
+    def __to_ndarray__():
+        return np.array([self.x, self.y])
 
 if __name__ == "__main__":
     #main loop
