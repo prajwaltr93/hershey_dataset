@@ -16,7 +16,9 @@ labels = data['sG_labels'][200:204]
 
 print("image shape : ",np.shape(imgs[0]))
 for img, label in zip(imgs,labels):
-
+    #get label image
+    label = np.reshape(label,(95,60))
+    img = np.transpose(img,(2,0,1))
     _, axs = plt.subplots(1,5)
     axs[0].imshow(img[0],cmap="Greys_r")
     axs[1].imshow(img[1],cmap="Greys_r")
