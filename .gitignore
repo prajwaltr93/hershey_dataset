@@ -3,3 +3,4 @@
 **/*.png
 **/global_dataset/
 .gitignore
+**/__pycache__/
