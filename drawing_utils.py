@@ -1,3 +1,12 @@
+#filename : create_globaldataset.py
+#author : PRAJWAL T R
+#date last modified : Mon Jul  13 11:09:55 2020
+#comments :
+
+'''
+    simple module with some basic drawing functions and user defined datatypes ex : class Point
+'''
+
 import cv2 as cv
 import re
 import matplotlib.pyplot as plt
