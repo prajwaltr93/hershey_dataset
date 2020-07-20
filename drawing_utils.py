@@ -11,6 +11,7 @@ import cv2 as cv
 import re
 import matplotlib.pyplot as plt
 import numpy as np
+from bresenhamsalgo import getPoints
 
 #globals
 WIDTH = 60
@@ -20,6 +21,12 @@ THICKNESS = 1
 LINE_TYPE = cv.LINE_AA
 path_re = re.compile(r'\t(.*)\n')
 points_re = re.compile(r'(\d+),\s(\d+)')
+
+#debug functions
+def showImage(img):
+    cv.imshow("show window",img)
+    cv.imwrite("debug_image_out.png",img)
+    cv.waitKey(0)
 
 def parsePointString(point_string):
     #get x and y cordinate out of point_string
@@ -86,6 +93,33 @@ def getStrokesIndices(svg_string):
             m_indices.append(search_ind)
     return X_target, m_indices
 
+def drawFromPoints(points):
+    #if points = empty then return blank image
+
+    img = np.zeros((HEIGHT, WIDTH))
+
+    if len(points) == 0:
+        return img
+
+    #else draw for each point
+    for ind in range(len(points) - 1):
+        cv.line(img, points[ind], points[ind + 1],COLOR, THICKNESS, LINE_TYPE)
+    return img
+
+def pointDiff(pointA, pointB):
+    #return dx, dy
+    return [pointA[0] - pointB[0],pointA[1] - pointB[1]]
+
+def getAllPoints(stroke):
+    #stroke = list of ML,MLL,MLLL
+    point_list = []
+    for ind in range(len(stroke) - 1):
+        x0, y0 = parsePointString(stroke[ind])
+        x1, y1 = parsePointString(stroke[ind + 1])
+        point_list += getPoints(x0, y0, x1, y1)
+        point_list.pop()
+    return point_list
+
 #point class
 class Point:
     '''
@@ -108,3 +142,5 @@ class Point:
         return "X : {} Y : {}\n".format(self.x, self.y)
     def __to_ndarray__():
         return np.array([self.x, self.y])
+    def getPoints(self):
+        return self.x, self.y
