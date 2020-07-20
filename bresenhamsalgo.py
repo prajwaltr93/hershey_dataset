@@ -9,7 +9,7 @@
 
 from drawing_utils import *
 
-def getPoints(x0, y0,x1, y1): #arguments pointA,pointB are objects of class Point
+def getPoints(x0, y0,x1, y1): 
     point_list = []
 
     def plotLineLow(x0,y0, x1,y1):
@@ -23,7 +23,7 @@ def getPoints(x0, y0,x1, y1): #arguments pointA,pointB are objects of class Poin
         y = y0
 
         for x in range(x0, x1 +1):
-            point_list.append((x, y)) # + 10 is added for visualising, creates a parallel line indicates that algorithm is working !
+            point_list.append((x, y))
             if D > 0:
                 y = y + yi
                 D = D - 2*dx
