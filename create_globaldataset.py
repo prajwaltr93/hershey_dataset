@@ -47,11 +47,6 @@ dataset = {
     "sG_data" : [],
     "sG_labels" : []
 }
-#debug functions
-def showImage(img):
-    cv.imshow("show window",img)
-    cv.imwrite("debug_image_out.png",img)
-    cv.waitKey(0)
 
 #helper functions
 def plotImages(ind, X_loc_img, X_env_img, X_last_img, X_diff_img):
