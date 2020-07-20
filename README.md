@@ -5,8 +5,12 @@ Tool to extract svg's from hershey's font definition, dataset of already extract
 actual datset is not uploaded in this repository because of the size 4.2GB ! dataset can be created by simply running the script create_globaldataset.py
 
 ```
+$./extract_hershey_font.py
+$./svg_to_png.py  #removes invalid files
 $mkdir global_dataset
 $./create_globaldataset.py
+$mkdir local_dataset
+$./create_localdataset.py
 ```
 
 ### Dependencies
@@ -27,6 +31,8 @@ numpy
 
 ./create_globaldataset.py   creates global dataset in /global_dataset directory
 
+./create_localdataset.py    create local dataset in /local_dataset directory
+
 This dataset was inspired from paper :
 
 ### Teaching Robots To Draw
@@ -43,6 +49,10 @@ Original paper was based on japanese characters, you can also extract the same u
 
 ### TODO :
 
-[ ] create a complete dataset of action lines and other information for training both global and local model
+- [x] create global dataset
 
-[ ] create a pickled form of dataset
+- [ ] create local dataset
+
+- [x] create a pickled form of global dataset
+
+- [ ] create guide and script to get global and local dataset
