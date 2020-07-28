@@ -1,5 +1,3 @@
-#!/home/starkm42/opencvprjcts/bin/python3
-
 #filename : create_globaldataset.py
 #author : PRAJWAL T R
 #date last modified : Wed Jul  1 11:09:55 2020

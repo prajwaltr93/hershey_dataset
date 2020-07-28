@@ -1,5 +1,3 @@
-#!/home/starkm42/opencvprjcts/bin/python3
-
 #filename : create_localdataset.py
 #author : PRAJWAL T R
 #date last modified : Mon Jul 13 14:25:12 2020
@@ -26,7 +24,7 @@
 
     keywords :
         X_env : visited region
-        X_con: continoulsy connected strok
+        X_con: continoulsy connected stroke
         X_diff: remaining strokes to draw
     lG : state of local model
 '''
