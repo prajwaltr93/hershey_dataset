@@ -2,7 +2,7 @@
 
 Tool to extract svg's from hershey's font definition, dataset of already extracted fonts in svg format is available in compressed to font_svgs zip file.
 
-actual datset is not uploaded in this repository because of the size 4.2GB ! dataset can be created by simply running the script create_globaldataset.py
+actual datset is not uploaded in this repository because of the size 4.2GB ! dataset can be created by simply following below steps.
 
 ```
 $./extract_hershey_font.py
@@ -10,7 +10,7 @@ $./svg_to_png.py  #removes invalid files
 $mkdir global_dataset
 $./create_globaldataset.py
 $mkdir local_dataset
-$./create_localdataset.py
+$./create_localdataset.py # still work in progress !
 ```
 
 ### Dependencies
@@ -45,7 +45,7 @@ Brown University
 
 ### NOTE !
 
-Original paper was based on japanese characters, you can also extract the same using the script in this repository
+Original paper was based on japanese characters, you can also extract the same using the script in this repository, get the japaneses and roman jhf file from http://paulbourke.net/dataformats/hershey/
 
 ### TODO :
 
