@@ -8,13 +8,14 @@ import pickle as pic
 import matplotlib.pyplot as plt
 import numpy as np
 
-data = pic.load(open("./global_dataset/data_batch_0","rb"), encoding="bytes")
+data = pic.load(open("./global_dataset/data_batch_1","rb"), encoding="bytes")
 
 imgs = data['sG_data'][200:204]
 
 labels = data['sG_labels'][200:204]
 
 print("image shape : ",np.shape(imgs[0]))
+print("label shape : ",np.shape(labels[0]))
 for img, label in zip(imgs,labels):
     #get label image
     label = np.reshape(label,(95,60))

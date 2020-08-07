@@ -100,7 +100,7 @@ if __name__ == "__main__":
                     #plotImages(str(index), X_loc_img, X_env_img, X_last_img, X_diff_img)
                     #update to dataset
                     dataset['sG_data'].append(np.dstack((X_loc_img, X_env_img, X_last_img, X_diff_img)))
-                    dataset['sG_labels'].append(np.reshape(X_label_img, (1, (HEIGHT * WIDTH))))
+                    dataset['sG_labels'].append(np.reshape(X_label_img, (HEIGHT * WIDTH)))
                     #udpate variables
                     if (len(m_indices) == 1) or (index + 1 == len(m_indices)):
                         #X_target has only one stroke
@@ -111,4 +111,3 @@ if __name__ == "__main__":
                     X_diff = X_target[m_indices[index + 1]:]
                     label.updatePoint(X_target[m_indices[index + 1]])
             pickleDataset(dataset,break_ind)
-        break
