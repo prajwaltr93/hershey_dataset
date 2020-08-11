@@ -16,7 +16,7 @@
 R = ord('R')
 min_x = -40
 min_y = -50
-max_x = 20
+max_x = 25
 max_y = 45
 
 svg_start_line = "<svg xmlns='http://www.w3.org/2000/svg' \nxmlns:xlink='http://www.w3.org/1999/xlink' \n"
@@ -25,10 +25,10 @@ l_line = "\tL %s, %s\n"
 
 #helper functions
 def ord_string(parse_res):
-    #print(parse_res)
+    # print(parse_res)
     return (ord(parse_res[0]) - R - min_x), (ord(parse_res[1]) - R - min_y)
 
-def parse_command(flag,command):
+def parse_command(fd, flag, command):
     parse_pointer = 0
     if command[-1] == '\n':
         command = command[:len(command)]
@@ -38,7 +38,7 @@ def parse_command(flag,command):
     #process R or start drawing ex M x,y
     parse_res = command[parse_pointer:parse_pointer+2]
     fd.write(m_line % ord_string(parse_res))
-    print(m_line % ord_string(parse_res))
+    # print(m_line % ord_string(parse_res))
     parse_pointer += 2
 
     #recursively extract command
@@ -50,45 +50,47 @@ def parse_command(flag,command):
             parse_res = command[parse_pointer:parse_pointer+2]
 
         fd.write(l_line % ord_string(parse_res))
-        print(l_line % ord_string(parse_res))
+        # print(l_line % ord_string(parse_res))
         parse_pointer += 2
 
-thresh = 0
-fd = open("hershey.jhf","r")
+def get_fonts(fd):
+    for raw_line in fd:
 
-for raw_line in fd:
+        ## print(f"ascii {raw_line[:6]} vertices {raw_line[6:8]} rest {raw_line[8:]}")
+        line_number = int(raw_line[:6].strip())
+        vertices = int(raw_line[6:8].strip())
+        command_string = raw_line[8:]
+        commands = command_string.split(" ")
+        # print(line_number,vertices,command_string,commands)
 
-    #print(f"ascii {raw_line[:6]} vertices {raw_line[6:8]} rest {raw_line[8:]}")
-    line_number = int(raw_line[:6].strip())
-    vertices = int(raw_line[6:8].strip())
-    command_string = raw_line[8:]
-    commands = command_string.split(" ")
-    #print(line_number,vertices,command_string,commands)
+        #prepare file
+        write_fd = open("./font_svgs/"+str(line_number)+".svg","w")
+        write_fd.write(svg_start_line) #write first line
 
-    #prepare file
-    fd = open("./font_svgs/"+str(line_number)+".svg","w")
-    fd.write(svg_start_line) #write first line
+        #get metrics
+        left_line = ord(commands[0][0])
+        right_line = ord(commands[0][1])
+        width = right_line - left_line
+        # print(left_line,right_line,width)
+        write_fd.write(f"viewBox = \'{min_x - min_x} {min_y - min_y} {max_x - min_x} {max_y - min_y}\' >\n")
+        write_fd.write("<path d = '\n")
+        # print(width,left_line,right_line)
+        #remove characters containing metrics
+        commands[0] = commands[0][2:]
 
-    #get metrics
-    left_line = ord(commands[0][0])
-    right_line = ord(commands[0][1])
-    width = right_line - left_line
-    print(left_line,right_line,width)
-    fd.write(f"viewBox = \'{min_x - min_x} {min_y - min_y} {max_x - min_x} {max_y - min_y}\' >\n")
-    fd.write("<path d = '\n")
-    #print(width,left_line,right_line)
-    #remove characters containing metrics
-    commands[0] = commands[0][2:]
+        if len(commands[0]) != 1:
+            #get vertices
+            for command in commands:
+                if command[0] == 'R' and commands.index(command) != 0:
+                    parse_command(write_fd, True, command)
+                else:
+                    parse_command(write_fd, False, command)
+                write_fd.write("\n")
+        write_fd.write("' fill='none' stroke='black' />\n")
+        write_fd.write("</svg>")
+        write_fd.close()
 
-    if len(commands[0]) != 1:
-        #get vertices
-        for command in commands:
-            if command[0] == 'R' and commands.index(command) != 0:
-                parse_command(True,command)
-            else:
-                parse_command(False,command)
-            fd.write("\n")
-    fd.write("' fill='none' stroke='black' />\n")
-    fd.write("</svg>")
-    fd.close()
-    thresh += 1
+if __name__ == "__main__":
+    files = ['japanese_hershey.jhf', 'hershey.jhf']
+    for file in files:
+        get_fonts(open(file,'r'))

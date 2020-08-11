@@ -14,7 +14,7 @@ import numpy as np
 from bresenhamsalgo import getPoints
 
 #globals
-WIDTH = 60
+WIDTH = 65
 HEIGHT = 95
 COLOR = 1
 THICKNESS = 1
