@@ -6,7 +6,7 @@ actual datset is not uploaded in this repository because of the size 4.2GB ! dat
 
 ```
 $./extract_hershey_font.py
-$./svg_to_png.py  #removes invalid files
+$./remove_invalid_svg.py  #removes invalid files ex:  empty svg files
 $mkdir global_dataset
 $./create_globaldataset.py
 $mkdir local_dataset
@@ -45,7 +45,7 @@ Brown University
 
 ### NOTE !
 
-Original paper was based on japanese characters, you can also extract the same using the script in this repository, get the japaneses and roman jhf file from http://paulbourke.net/dataformats/hershey/
+Original paper was based on japanese characters, you can also extract the same using the script in this repository, get the japaneses and roman jhf file from http://paulbourke.net/dataformats/hershey/ (UPDATE : both files are now available in this repository )
 
 ### TODO :
 
@@ -56,3 +56,5 @@ Original paper was based on japanese characters, you can also extract the same u
 - [x] create a pickled form of global dataset
 
 - [ ] create guide and script to get global and local dataset
+
+- [x] added japanese characters
