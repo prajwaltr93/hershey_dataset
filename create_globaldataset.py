@@ -46,6 +46,12 @@ dataset = {
     "sG_labels" : []
 }
 
+#meta-data structure
+metadata = {
+    "img_dim" : [HEIGHT, WIDTH],
+    "label_dim" : [HEIGHT*WIDTH],
+    "total_samples" : 0
+}
 #helper functions
 def plotImages(ind, X_loc_img, X_env_img, X_last_img, X_diff_img):
     fig, axs = plt.subplots(1,4)
@@ -73,6 +79,7 @@ def pickleDataset(dataset,ind):
 
 if __name__ == "__main__":
     #get sample rate
+    len_sample = 0
     sample_rate = sys.argv[1] if (len(sys.argv) == 2) else 300
     #main loop
     _, _, filelist = next(walk(traverse_path))
@@ -104,6 +111,7 @@ if __name__ == "__main__":
                 #update to dataset
                 dataset['sG_data'].append(np.dstack((X_loc_img, X_env_img, X_last_img, X_diff_img)))
                 dataset['sG_labels'].append(np.reshape(X_label_img, (HEIGHT * WIDTH)))
+                len_sample += 1
                 #udpate variables
                 if (len(m_indices) == 1) or (index + 1 == len(m_indices)):
                     #X_target has only one stroke
@@ -114,3 +122,6 @@ if __name__ == "__main__":
                 X_diff = X_target[m_indices[index + 1]:]
                 label.updatePoint(X_target[m_indices[index + 1]])
         pickleDataset(dataset,break_ind)
+    metadata["total_samples"] = len_sample
+    meta_fd = open(global_dataset_path+"metadata",'wb')
+    pic.dump(metadata,meta_fd) #create metadata file

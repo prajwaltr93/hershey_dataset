@@ -108,7 +108,7 @@ def drawFromPoints(points):
 
 def pointDiff(pointA, pointB):
     #return dx, dy
-    return [pointA[0] - pointB[0],pointA[1] - pointB[1]]
+    return [pointB[0] - pointA[0], pointB[1] - pointA[1]]
 
 def getAllPoints(stroke):
     #stroke = list of ML,MLL,MLLL
@@ -117,7 +117,9 @@ def getAllPoints(stroke):
         x0, y0 = parsePointString(stroke[ind])
         x1, y1 = parsePointString(stroke[ind + 1])
         point_list += getPoints(x0, y0, x1, y1)
-        point_list.pop()
+        point_list.pop() #avoid redundant points
+    x1, y1 = parsePointString(stroke[-1])
+    point_list += [(x1, y1)] #append last point 
     return point_list
 
 #point class

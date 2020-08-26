@@ -9,7 +9,7 @@
 
 from drawing_utils import *
 
-def getPoints(x0, y0,x1, y1): 
+def getPoints(x0, y0,x1, y1):
     point_list = []
 
     def plotLineLow(x0,y0, x1,y1):
@@ -57,5 +57,5 @@ def getPoints(x0, y0,x1, y1):
         else :
             plotLineHigh(x0, y0, x1, y1)
     if len(point_list) % 2 == 0:
-        return [point_list[i] for i in range(0,len(point_list),2)] + [point_list[-1]]
-    return [point_list[i] for i in range(0,len(point_list),2)]
+        return [point_list[i] for i in range(0, len(point_list),2)] + [point_list[-1]]
+    return [point_list[i] for i in range(0, len(point_list), 2)] 
