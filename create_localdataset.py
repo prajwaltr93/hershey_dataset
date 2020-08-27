@@ -9,7 +9,7 @@
     dataset structure :
         dataset : {
             lG_data : [
-                [[X_env],[X_con],[X_diff]] ,
+                [X_env, X_con, X_diff] ,
                 ... ,
                 ... ,
             ] ,
@@ -49,6 +49,35 @@ _, _, filelist = next(walk(traverse_path))
 
 breaks = [i for i in range(0, len(filelist), sample_rate)]
 
+#dataset structure
+dataset = {
+    'lG_data' : [],
+    'lG_extract' : [],
+    'lG_touch' : [],
+    'lG_labels' : []
+}
+
+def getSliceWindow(current_xy):
+    '''
+        generate two variables begin and size for dynamice tensor slicing using tf.slice
+    '''
+    x, y = current_xy[0], current_xy[1]
+    begin = [x - 2, y - 2 , 0] # zero slice begin for batch size and channel dimension
+    #size = [5, 5]
+    return np.array(begin)
+
+def pickleDataset(dataset,ind):
+    out_path = global_dataset_path+"data_batch_"+str(ind)
+    fd = open(out_path,"wb")
+    #convert list to numpy array ie : compatiable with tensorflow adapter
+    dataset['sG_data'] = np.array(dataset['sG_data'])
+    dataset['sG_labels'] = np.array(dataset['sG_labels'])
+    pic.dump(dataset,fd)
+    print("dataset created at : ",out_path)
+    #clear contents of dataset structure
+    dataset['sG_data'] = []
+    dataset['sG_labels'] = []
+
 for break_ind in range(len(breaks) - 1):
     for file in filelist[breaks[break_ind] : breaks[break_ind + 1]]:
         svg_string = open(traverse_path+file).read()
@@ -78,7 +107,8 @@ for break_ind in range(len(breaks) - 1):
                 print("target : ", target)
                 print("current_xy : ", current_xy)
                 print("touch : ", touch)
-                #update env,diff
+                print("current slice window : ", getSliceWindow(current_xy).shape)
+                #update env,diffg
                 env_l = points[0 : ind + 2] # add two points for one complete stroke
                 diff_l = points[ind + 1 :]
 
@@ -95,4 +125,5 @@ for break_ind in range(len(breaks) - 1):
             print("target : ", target)
             print("current_xy : ", current_xy)
             print("touch : ", touch)
+            print("current slice window : ", getSliceWindow(current_xy).shape)
             exit(0)
