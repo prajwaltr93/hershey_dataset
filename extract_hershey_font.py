@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 #filename : extract_hershey_font.py
 #author : Prajwal T R
 #date last modified : Thu Jun 11 09:29:03 2020
@@ -91,6 +89,11 @@ def get_fonts(fd):
         write_fd.close()
 
 if __name__ == "__main__":
-    files = ['japanese_hershey.jhf', 'hershey.jhf']
+    from sys import argv
+    # just simple validations to check if users wants minimal fonts coverage ex : english alphabets or japanese characters too
+    if len(argv) == 1:
+        files = [['japanese_hershey.jhf', 'hershey.jhf'][1]]
+    else:
+        files = ['japanese_hershey.jhf', 'hershey.jhf']
     for file in files:
         get_fonts(open(file,'r'))
