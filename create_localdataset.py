@@ -158,4 +158,4 @@ for break_ind in range(len(breaks) - 1):
             dataset['lG_touch'].append(np.array([touch]))
     #save dataset to disk
     pickleLocalDataset(dataset,  break_ind)
-    exit(0)
+    exit(0) #remove this if you want to create more than one dataset 
