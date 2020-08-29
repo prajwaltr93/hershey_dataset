@@ -41,10 +41,12 @@
 
 from drawing_utils import *
 from os import walk
+import pickle as pic
+
 
 traverse_path = "./font_svgs/"
 local_dataset_path = "./local_dataset/"
-sample_rate = 300
+sample_rate = 100
 _, _, filelist = next(walk(traverse_path))
 
 breaks = [i for i in range(0, len(filelist), sample_rate)]
@@ -76,7 +78,7 @@ def plotImages(*images):
     for image, index in zip(images, range(len(images))):
         axs[index].imshow(image)
         axs[index].set_title("image :" + index.__str__())
-    plt.savefig("local_dataset "+ ind.__str__() + ".png")
+    plt.savefig(local_dataset_path + "local_dataset "+ ind.__str__() + ".png")
 
 def getSliceWindow(current_xy):
     '''
@@ -127,13 +129,13 @@ for break_ind in range(len(breaks) - 1):
                 diff_img = drawFromPoints(diff_l)
                 # outputs
                 next_xy_img = getCroppedImage(next_xy, current_xy) # 5 * 5 image with one point drawn and cropped at current_xy
-                #plot images for verfication
+                # plot images for verfication
                 # plotImages(ind,[con_img, env_img, diff_img, next_xy_img])
                 # update dataset
                 dataset['lG_data'].append(np.dstack((env_img, diff_img, con_img)))
                 dataset['lG_extract'].append(ext_inp)
-                dataset['lG_croppedimg'].append(next_xy_img)
-                dataset['lG_touch'].append(touch)
+                dataset['lG_croppedimg'].append(np.reshape(next_xy_img, (5 * 5)))
+                dataset['lG_touch'].append(np.array([touch]))
                 # update env,diffg
                 env_l = points[0 : ind + 2] # add two points for one complete stroke
                 diff_l = points[ind + 1 :]
@@ -152,8 +154,8 @@ for break_ind in range(len(breaks) - 1):
             next_xy_img = np.zeros((5, 5)) # 5 * 5 empty image
             dataset['lG_data'].append(np.dstack((env_img, diff_img, con_img)))
             dataset['lG_extract'].append(ext_inp)
-            dataset['lG_croppedimg'].append(next_xy_img)
-            dataset['lG_touch'].append(touch)
+            dataset['lG_croppedimg'].append(np.reshape(next_xy_img, (5 * 5)))
+            dataset['lG_touch'].append(np.array([touch]))
     #save dataset to disk
     pickleLocalDataset(dataset,  break_ind)
     exit(0)
