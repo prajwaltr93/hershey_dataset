@@ -4,3 +4,4 @@
 **/global_dataset/
 .gitignore
 **/__pycache__/
+local_dataset/
