@@ -10,7 +10,7 @@ $./remove_invalid_svg.py  #removes invalid files ex:  empty svg files
 $mkdir global_dataset
 $./create_globaldataset.py
 $mkdir local_dataset
-$./create_localdataset.py # still work in progress !
+$./create_localdataset.py
 ```
 
 ### Dependencies
@@ -51,10 +51,14 @@ Original paper was based on japanese characters, you can also extract the same u
 
 - [x] create global dataset
 
-- [ ] create local dataset
+- [x] create local dataset
 
 - [x] create a pickled form of global dataset
 
 - [ ] create guide and script to get global and local dataset
 
 - [x] added japanese characters
+
+- [ ] make user friendly scrpts  
+
+- [ ] write script to visualise local dataset
