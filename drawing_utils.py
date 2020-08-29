@@ -21,7 +21,7 @@ THICKNESS = 1
 LINE_TYPE = cv.LINE_AA
 path_re = re.compile(r'\t(.*)\n')
 points_re = re.compile(r'(\d+),\s(\d+)')
-
+test_dir_path = "./test_dir/"
 #debug functions
 def showImage(img):
     cv.imshow("show window",img)
@@ -119,7 +119,7 @@ def getAllPoints(stroke):
         point_list += getPoints(x0, y0, x1, y1)
         point_list.pop() #avoid redundant points
     x1, y1 = parsePointString(stroke[-1])
-    point_list += [(x1, y1)] #append last point 
+    point_list += [(x1, y1)] #append last point
     return point_list
 
 #point class
