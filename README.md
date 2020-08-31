@@ -4,6 +4,14 @@ Tool to extract svg's from hershey's font definition, dataset of already extract
 
 actual datset is not uploaded in this repository because of the size 4.2GB ! dataset can be created by simply following below steps.
 
+Local Dataset
+
+![local_model](./res/local_model.gif)
+
+Global Dataset
+
+![global_model](./res/global_model.gif)
+
 ```
 $./extract_hershey_font.py
 $./remove_invalid_svg.py  #removes invalid files ex:  empty svg files
@@ -55,10 +63,8 @@ Original paper was based on japanese characters, you can also extract the same u
 
 - [x] create a pickled form of global dataset
 
-- [ ] create guide and script to get global and local dataset
+- [x] create guide and script to get global and local dataset
 
 - [x] added japanese characters
 
-- [ ] make user friendly scrpts  
-
-- [ ] write script to visualise local dataset
+- [x] upload visualisazations  
