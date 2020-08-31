@@ -43,10 +43,11 @@ from drawing_utils import *
 from os import walk
 import pickle as pic
 
+test_dir_path = "./test_dir/local_pics/"
 
 traverse_path = "./font_svgs/"
 local_dataset_path = "./local_dataset/"
-sample_rate = 100
+sample_rate = 60
 _, _, filelist = next(walk(traverse_path))
 
 breaks = [i for i in range(0, len(filelist), sample_rate)]
@@ -78,7 +79,7 @@ def plotImages(*images):
     for image, index in zip(images, range(len(images))):
         axs[index].imshow(image)
         axs[index].set_title("image :" + index.__str__())
-    plt.savefig(local_dataset_path + "local_dataset "+ ind.__str__() + ".png")
+    plt.savefig(test_dir_path + "local_dataset "+ ind.__str__() + ".png")
 
 def getSliceWindow(current_xy):
     '''
@@ -158,4 +159,4 @@ for break_ind in range(len(breaks) - 1):
             dataset['lG_touch'].append(np.array([touch]))
     #save dataset to disk
     pickleLocalDataset(dataset,  break_ind)
-    exit(0) #remove this if you want to create more than one dataset 
+    exit(0) #remove this if you want to create more than one dataset
