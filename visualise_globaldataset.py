@@ -1,25 +1,36 @@
-#!/usr/bin/python3
 #filename : visualise_dataset.py
 #author : PRAJWAL T R
 #date last modified : Sun Jul  5 09:22:30 2020
 #comments :
+'''
+    visualise pickled global dataset
+    script saves images in ./test_dir/global_pics/ so create one before running the script
+'''
 
 import pickle as pic
 import matplotlib.pyplot as plt
 import numpy as np
 
+test_dir_path = "./test_dir/global_pics/"
 data = pic.load(open("./global_dataset/data_batch_1","rb"), encoding="bytes")
 
-imgs = data['sG_data'][1:4]
+imgs = data['sG_data'][100:120]
 
-labels = data['sG_labels'][1:4]
+labels = data['sG_labels'][100:120]
 
 img_height = 95
 img_width = 65
 
 print("image shape : ",np.shape(imgs[0]))
 print("label shape : ",np.shape(labels[0]))
-for img, label in zip(imgs,labels):
+
+def generateImages(imgs, labels):
+    for img, label in zip(imgs, labels):
+        yield img, label
+
+data_gen = generateImages(imgs, labels)
+
+for img,label in data_gen:
     #get label image
     label = np.reshape(label,(img_height,img_width))
     img = np.transpose(img,(2,0,1))
@@ -34,4 +45,4 @@ for img, label in zip(imgs,labels):
     axs[2].set_title("X_last")
     axs[3].set_title("X_diff")
     axs[4].set_title("label")
-    plt.show()
+    plt.savefig(test_dir_path + "sample" + str(np.random.random()) + ".png")
