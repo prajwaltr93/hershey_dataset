@@ -49,7 +49,7 @@ dataset = {
 #meta-data structure
 metadata = {
     "img_dim" : [HEIGHT, WIDTH],
-    "label_dim" : [HEIGHT*WIDTH],
+    "label_dim" : (HEIGHT*WIDTH),
     "total_samples" : 0
 }
 #helper functions
