@@ -39,6 +39,8 @@ from drawing_utils import *
 
 traverse_path = "./font_svgs/"
 global_dataset_path = "./global_dataset/"
+#get sample rate
+len_sample = 0
 
 #dataset structure
 dataset = {
@@ -50,7 +52,8 @@ dataset = {
 metadata = {
     "img_dim" : [HEIGHT, WIDTH],
     "label_dim" : (HEIGHT*WIDTH),
-    "total_samples" : 0
+    "total_samples" : 0,
+    "validation_samples" : 0
 }
 #helper functions
 def plotImages(ind, X_loc_img, X_env_img, X_last_img, X_diff_img):
@@ -65,7 +68,11 @@ def plotImages(ind, X_loc_img, X_env_img, X_last_img, X_diff_img):
     axs[3].set_title("X_diff_img")
     plt.savefig("mygraph"+ind+".png")
 
-def pickleDataset(dataset,ind):
+def pickleDataset(dataset, ind, flag):
+    #check if incomming dataset is validation set
+    if flag:
+        metadata['validation_samples'] = len(dataset['sG_data'])
+        metadata['total_samples'] = len_sample - len(dataset['sG_data'])
     out_path = global_dataset_path+"data_batch_"+str(ind)
     fd = open(out_path,"wb")
     #convert list to numpy array ie : compatiable with tensorflow data adapter
@@ -78,9 +85,7 @@ def pickleDataset(dataset,ind):
     dataset['sG_labels'] = []
 
 if __name__ == "__main__":
-    #get sample rate
-    len_sample = 0
-    sample_rate = sys.argv[1] if (len(sys.argv) == 2) else 300
+    sample_rate = int(sys.argv[1]) if (len(sys.argv) == 2) else 300 # accepts only integer arguments
     #main loop
     _, _, filelist = next(walk(traverse_path))
     breaks = [i for i in range(0, len(filelist), sample_rate)]
@@ -121,7 +126,9 @@ if __name__ == "__main__":
                 X_last = X_target[m_indices[index] : m_indices[index + 1]]
                 X_diff = X_target[m_indices[index + 1]:]
                 label.updatePoint(X_target[m_indices[index + 1]])
-        pickleDataset(dataset,break_ind)
-    metadata["total_samples"] = len_sample
+        if break_ind == len(breaks) - 2: #pickle this as validation dataset
+            pickleDataset(dataset, break_ind, True)
+        else:
+            pickleDataset(dataset, break_ind, False)
     meta_fd = open(global_dataset_path+"metadata",'wb')
     pic.dump(metadata,meta_fd) #create metadata file
