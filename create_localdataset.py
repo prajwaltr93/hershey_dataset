@@ -48,9 +48,12 @@ test_dir_path = "./test_dir/local_pics/"
 traverse_path = "./font_svgs/"
 local_dataset_path = "./local_dataset/"
 sample_rate = 60
+crop_img_size = 5
+len_sample = 0 # counter
+file_cap = 260 # limit files to consider
 _, _, filelist = next(walk(traverse_path))
 
-breaks = [i for i in range(0, len(filelist), sample_rate)]
+breaks = [i for i in range(0, len(filelist[:file_cap]), sample_rate)]
 
 #dataset structure
 dataset = {
@@ -60,6 +63,14 @@ dataset = {
     'lG_croppedimg' : [] #output
 }
 
+#meta-data structure
+metadata = {
+    "img_dim" : [HEIGHT, WIDTH],
+    "target_img_dim" : (crop_img_size*crop_img_size),
+    "slice_tensor_dim" : 3,
+    "total_samples" : 0
+}
+
 def getCroppedImage(next_xy, current_xy):
     #create image with black background
     img = np.zeros((HEIGHT, WIDTH))
@@ -67,7 +78,7 @@ def getCroppedImage(next_xy, current_xy):
     img[next_xy[1], next_xy[0]] = COLOR # open cv and numpy has different axis for x and y
     #crop at current_xy
     slice_begin = getSliceWindow(current_xy)[:-1]
-    img = img[slice_begin[0] : slice_begin[0] + 5, slice_begin[1] : slice_begin[1] + 5]
+    img = img[slice_begin[0] : slice_begin[0] + crop_img_size, slice_begin[1] : slice_begin[1] + crop_img_size]
     return img #return cropped image
 
 def plotImages(*images):
@@ -135,8 +146,9 @@ for break_ind in range(len(breaks) - 1):
                 # update dataset
                 dataset['lG_data'].append(np.dstack((env_img, diff_img, con_img)))
                 dataset['lG_extract'].append(ext_inp)
-                dataset['lG_croppedimg'].append(np.reshape(next_xy_img, (5 * 5)))
+                dataset['lG_croppedimg'].append(np.reshape(next_xy_img, (crop_img_size * crop_img_size)))
                 dataset['lG_touch'].append(np.array([touch]))
+                len_sample += 1
                 # update env,diffg
                 env_l = points[0 : ind + 2] # add two points for one complete stroke
                 diff_l = points[ind + 1 :]
@@ -152,11 +164,14 @@ for break_ind in range(len(breaks) - 1):
             env_img = drawFromPoints(env_l)
             diff_img = drawFromPoints(diff_l)
             # outputs
-            next_xy_img = np.zeros((5, 5)) # 5 * 5 empty image
+            next_xy_img = np.zeros((crop_img_size, crop_img_size)) # 5 * 5 empty image
             dataset['lG_data'].append(np.dstack((env_img, diff_img, con_img)))
             dataset['lG_extract'].append(ext_inp)
-            dataset['lG_croppedimg'].append(np.reshape(next_xy_img, (5 * 5)))
+            dataset['lG_croppedimg'].append(np.reshape(next_xy_img, (crop_img_size * crop_img_size)))
             dataset['lG_touch'].append(np.array([touch]))
     #save dataset to disk
     pickleLocalDataset(dataset,  break_ind)
-    exit(0) #remove this if you want to create more than one dataset
+#pickle meta data
+metadata["total_samples"] = len_sample
+meta_fd = open(local_dataset_path+"metadata",'wb')
+pic.dump(metadata,meta_fd) #create metadata file
