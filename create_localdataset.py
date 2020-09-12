@@ -48,7 +48,6 @@ test_dir_path = "./test_dir/local_pics/"
 traverse_path = "./font_svgs/"
 local_dataset_path = "./local_dataset/"
 sample_rate = 60
-crop_img_size = 5
 len_sample = 0 # counter
 file_cap = 260 # limit files to consider
 _, _, filelist = next(walk(traverse_path))
@@ -61,14 +60,6 @@ dataset = {
     'lG_extract' : [],
     'lG_touch' : [], #output
     'lG_croppedimg' : [] #output
-}
-
-#meta-data structure
-metadata = {
-    "img_dim" : [HEIGHT, WIDTH],
-    "target_img_dim" : (crop_img_size*crop_img_size),
-    "slice_tensor_dim" : 3,
-    "total_samples" : 0
 }
 
 def getCroppedImage(next_xy, current_xy):
@@ -148,7 +139,6 @@ for break_ind in range(len(breaks) - 1):
                 dataset['lG_extract'].append(ext_inp)
                 dataset['lG_croppedimg'].append(np.reshape(next_xy_img, (crop_img_size * crop_img_size)))
                 dataset['lG_touch'].append(np.array([touch]))
-                len_sample += 1
                 # update env,diffg
                 env_l = points[0 : ind + 2] # add two points for one complete stroke
                 diff_l = points[ind + 1 :]
@@ -171,7 +161,3 @@ for break_ind in range(len(breaks) - 1):
             dataset['lG_touch'].append(np.array([touch]))
     #save dataset to disk
     pickleLocalDataset(dataset,  break_ind)
-#pickle meta data
-metadata["total_samples"] = len_sample
-meta_fd = open(local_dataset_path+"metadata",'wb')
-pic.dump(metadata,meta_fd) #create metadata file
