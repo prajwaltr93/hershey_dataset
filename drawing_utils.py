@@ -17,6 +17,7 @@ from bresenhamsalgo import getPoints
 WIDTH = 65
 HEIGHT = 95
 COLOR = 1
+crop_img_size = 5
 THICKNESS = 1
 LINE_TYPE = cv.LINE_AA
 path_re = re.compile(r'\t(.*)\n')
