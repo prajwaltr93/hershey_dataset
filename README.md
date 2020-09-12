@@ -37,9 +37,11 @@ numpy
 
 ./visualise_dataset.py 	    visualise pickled dataset
 
-./create_globaldataset.py   creates global dataset in /global_dataset directory
+./create_globaldataset.py   creates global dataset in ./global_dataset directory
 
-./create_localdataset.py    create local dataset in /local_dataset directory
+./create_localdataset.py    create local dataset in ./local_dataset directory
+
+./create_metadata.py        create a metadata file in respective dataset directory with train, test, validation sample values, helpful when experimenting with number of files to include for training and validation ex : for validation_steps, steps_per_epochs
 
 This dataset was inspired from paper :
 
@@ -68,3 +70,5 @@ Original paper was based on japanese characters, you can also extract the same u
 - [x] added japanese characters
 
 - [x] upload visualisazations  
+
+- [x] create seperate file to get metadata
