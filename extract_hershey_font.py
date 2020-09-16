@@ -91,8 +91,8 @@ def get_fonts(fd):
 if __name__ == "__main__":
     from sys import argv
     # just simple validations to check if users wants minimal fonts coverage ex : english alphabets or japanese characters too
-    if len(argv) == 1:
-        files = [['japanese_hershey.jhf', 'hershey.jhf'][1]]
+    if len(argv) == 2:
+        files = ['japanese_hershey.jhf']
     else:
         files = ['japanese_hershey.jhf', 'hershey.jhf']
     for file in files:

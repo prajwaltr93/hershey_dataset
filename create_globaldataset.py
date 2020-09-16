@@ -6,6 +6,13 @@
 '''
     python script to create dataset for global model in paper "Teaching Robots to Draw"
 
+    USAGE :
+    $python create_globaldataset.py <sample_rate>
+
+    <sample_rate>  : integer number of files to consider for one dataset
+
+    tip : use less sample rate for japanese characters ex : 90 or 100, for regualar characters sample rate of 300 works fine
+
     dataset structure :
         dataset : {
             sG_data : [
