@@ -94,6 +94,10 @@ for fold, fold_value in zip(traverse_list, traverse_values):
         temp_len += len(data[list(data.keys())[0]])
     metadata[fold_value] = temp_len
 
+# print generated metadata to output
+for key, item in metadata.items():
+    print(key, item)
+
 # pickle dataset
 fd = open(path + "metadata", 'wb')
 pic.dump(metadata, fd)
