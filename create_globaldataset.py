@@ -83,6 +83,7 @@ if __name__ == "__main__":
     sample_rate = int(sys.argv[1]) if (len(sys.argv) == 2) else 300 # accepts only integer arguments
     #main loop
     _, _, filelist = next(walk(traverse_path))
+    filelist = sorted(filelist)
     breaks = [i for i in range(0, len(filelist), sample_rate)]
     for break_ind in range(len(breaks) - 1):
         for file in filelist[breaks[break_ind] : breaks[break_ind + 1]]:
