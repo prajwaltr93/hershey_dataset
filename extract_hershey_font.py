@@ -14,9 +14,10 @@
 R = ord('R')
 min_x = -40
 min_y = -50
-max_x = 25
-max_y = 45
-
+WIDTH = 40
+HEIGHT = 40
+O_X = 20
+O_Y = 32
 svg_start_line = "<svg xmlns='http://www.w3.org/2000/svg' \nxmlns:xlink='http://www.w3.org/1999/xlink' \n"
 m_line = "\tM %s, %s\n"
 l_line = "\tL %s, %s\n"
@@ -70,7 +71,7 @@ def get_fonts(fd):
         right_line = ord(commands[0][1])
         width = right_line - left_line
         # print(left_line,right_line,width)
-        write_fd.write(f"viewBox = \'{min_x - min_x} {min_y - min_y} {max_x - min_x} {max_y - min_y}\' >\n")
+        write_fd.write(f"viewBox = \'{O_X} {O_Y} {WIDTH} {HEIGHT}\' >\n")
         write_fd.write("<path d = '\n")
         # print(width,left_line,right_line)
         #remove characters containing metrics
@@ -92,7 +93,7 @@ if __name__ == "__main__":
     from sys import argv
     # just simple validations to check if users wants minimal fonts coverage ex : english alphabets or japanese characters too
     if len(argv) == 2:
-        files = ['japanese_hershey.jhf']
+        files = ['hershey.jhf']
     else:
         files = ['japanese_hershey.jhf', 'hershey.jhf']
     for file in files:
