@@ -14,8 +14,10 @@ import numpy as np
 from bresenhamsalgo import getPoints
 
 #globals
-WIDTH = 65
-HEIGHT = 95
+O_X = 20
+O_Y = 32
+WIDTH = 40
+HEIGHT = 40
 COLOR = 1
 crop_img_size = 5
 THICKNESS = 1
@@ -29,10 +31,17 @@ def showImage(img):
     cv.imwrite("debug_image_out.png",img)
     cv.waitKey(0)
 
+# drawing utility functions
 def parsePointString(point_string):
     #get x and y cordinate out of point_string
     result_points = points_re.search(point_string)
-    return (int(result_points.group(1)), int(result_points.group(2)))
+    return [int(result_points.group(1)), int(result_points.group(2))]
+
+def offsetPoints(points):
+    #offset points with O_X, O_Y
+    points[0] = points[0] - O_X
+    points[1] = points[1] - O_Y
+    return tuple(points)
 
 def drawPoint(point):
     '''
@@ -62,7 +71,7 @@ def drawStroke(strokes):
                 L 14,14
         parse stroke and generate corresponding image
 
-        if stroke == Nan
+        if stroke == None
             generate empty image
         returns numpy representation of images
     '''
@@ -78,11 +87,11 @@ def drawStroke(strokes):
     for ind in range(len(m_indices) - 1):
         slice = strokes[m_indices[ind] : m_indices[ind + 1]]
         for ind in range(len(slice) - 1):
-            cv.line(img,parsePointString(slice[ind]),parsePointString(slice[ind+1]),COLOR,THICKNESS,LINE_TYPE)
+            cv.line(img,offsetPoints(parsePointString(slice[ind])),offsetPoints(parsePointString(slice[ind+1])),COLOR,THICKNESS,LINE_TYPE)
     #for length of m_indices = 1 and drawing end strokes
     slice = strokes[m_indices[-1] : ]
     for ind in range(len(slice) - 1):
-        cv.line(img,parsePointString(slice[ind]),parsePointString(slice[ind+1]),COLOR,THICKNESS,LINE_TYPE)
+        cv.line(img,offsetPoints(parsePointString(slice[ind])),offsetPoints(parsePointString(slice[ind+1])),COLOR,THICKNESS,LINE_TYPE)
     return img
 
 def getStrokesIndices(svg_string):
@@ -139,6 +148,7 @@ class Point:
     def updatePoint(self, point_string):
         #update X_loc
         points = parsePointString(point_string)
+        points = offsetPoints(points)
         self.x = points[0]
         self.y = points[1]
     def __str__(self):
