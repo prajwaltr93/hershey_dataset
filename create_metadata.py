@@ -76,7 +76,7 @@ from os import walk
 
 _, _, filelist = next(walk(path))
 if (train + validation + test) > len(filelist):
-    print("Found only {} data files, requested for {} files".format(len(filelist) - 1, train + test + validation))
+    print("Found {} data files, requested for {} files".format(len(filelist) - 1, train + test + validation))
     exit(0)
 
 # create metadata structure
