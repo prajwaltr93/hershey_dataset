@@ -114,9 +114,12 @@ for break_ind in range(len(breaks) - 1):
         X_target, m_indices = getStrokesIndices(svg_string)
         #loop through all strokes
         for index in range(len(m_indices) - 1):
-            #get current stroke
-            stroke = X_target[m_indices[index] : m_indices[index + 1]]
-
+            # handle single strokes
+            try:
+                #get current stroke
+                stroke = X_target[m_indices[index] : m_indices[index + 1]]
+            except: # out of index exception
+                stroke = X_target[m_indices[index]:-1]
             #all points for given stroke ML,MLL,MLLLL
             points = getAllPoints(stroke)
             env_l = []
