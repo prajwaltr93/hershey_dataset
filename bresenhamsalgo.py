@@ -23,7 +23,7 @@ def getPoints(x0, y0,x1, y1):
         y = y0
 
         for x in range(x0, x1 +1):
-            point_list.append((x, y))
+            point_list.append([x, y])
             if D > 0:
                 y = y + yi
                 D = D - 2*dx
@@ -40,7 +40,7 @@ def getPoints(x0, y0,x1, y1):
         x = x0
 
         for y in range(y0, y1+1):
-            point_list.append((x, y))
+            point_list.append([x, y])
             if D > 0:
                 x = x + xi
                 D = D - 2*dy
@@ -58,4 +58,4 @@ def getPoints(x0, y0,x1, y1):
             plotLineHigh(x0, y0, x1, y1)
     if len(point_list) % 2 == 0:
         return [point_list[i] for i in range(0, len(point_list),2)] + [point_list[-1]]
-    return [point_list[i] for i in range(0, len(point_list), 2)] 
+    return [point_list[i] for i in range(0, len(point_list), 2)]
