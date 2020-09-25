@@ -5,3 +5,4 @@
 .gitignore
 **/__pycache__/
 local_dataset/
+test_dir/*
