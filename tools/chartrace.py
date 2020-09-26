@@ -1,17 +1,20 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-from os import walk
+from os import walk, remove
+
 # constants
 relief = tk.GROOVE
-traverse_path = './font_pngs/'
+traverse_path = '../font_pngs/'
+output_path = './out_svgs/'
 _, _, filelist = next(walk(traverse_path))
 filelist = sorted(filelist)
-counter = 0
+filelist = (file for file in filelist) # generator
 grid_size = 40
 button_size = 10
 items_list = []
 points_list = []
 final_points_list = []
+file_used = 0
 WIDTH = 40
 HEIGHT = 40
 O_X = 20
@@ -22,11 +25,11 @@ l_line = "\tL %s, %s\n"
 
 # helper functions
 def save_action():
-    global points_list, final_points_list, counter
+    global points_list, final_points_list, file_used
     if len(final_points_list) == 0:
+        print(file_used)
         return
-    # open an svg file
-    write_fd = open(output_path+str(counter)+".svg","w")
+    write_fd = open(output_path+file_used.split(".")[0]+".svg","w")
     write_fd.write(svg_start_line)
     write_fd.write(f"viewBox = \'{O_X} {O_Y} {WIDTH} {HEIGHT}\' >\n")
     write_fd.write("<path d = '\n")
@@ -35,20 +38,24 @@ def save_action():
     for points in final_points_list:
         # M - move command
         write_fd.write(m_line % ((points[0][0] + O_X).__str__(),(points[0][1] + O_Y).__str__()))
-        for point in points[0:]:
+        for point in points[1:]:
             write_fd.write(l_line % ((point[0] + O_X).__str__(), (point[1] + O_Y).__str__()))
 
     write_fd.write("' fill='none' stroke='black' />\n")
     write_fd.write("</svg>")
     write_fd.close()
-    counter += 1
+
+    remove(traverse_path + file_used)
     clear_preview()
+    next_image()
 
 def clear_preview():
     global points_list
+    global final_points_list
     for item in items_list:
         drawing_canvas.itemconfig(item, fill='')
     points_list = []
+    final_points_list = []
     preview_canvas.delete('all')
 
 def update_preview():
@@ -58,7 +65,7 @@ def update_preview():
         for ind in range(len(points_list) - 1):
             cur_point = points_list[ind]
             next_point = points_list[ind + 1]
-            preview_canvas.create_line(cur_point[0] * button_size, cur_point[1] * button_size, next_point[0] * button_size , next_point[1] * button_size, fill="red", width=3)
+            preview_canvas.create_line(cur_point[0] * button_size, cur_point[1] * button_size, next_point[0] * button_size , next_point[1] * button_size, fill="black", width=3)
 
 def mouse_clicked(event):
     item_tag = event.widget.gettags('current')
@@ -68,7 +75,7 @@ def mouse_clicked(event):
     #get points
     points = [int(point) for point in item_tag[0].split('*')]
     points_list.append(points)
-    print(points_list)
+    # print(points_list)
     update_preview()
 
 def mouse_rclicked(event):
@@ -79,19 +86,13 @@ def mouse_rclicked(event):
     final_points_list.append(points_list)
     points_list = []
 
-
-def prev():
-    global counter
-    counter -= 1
-    image = Image.open("./font_pngs/" + filelist[counter])
-    photo = ImageTk.PhotoImage(image)
-    drawing_canvas.itemconfigure(image_id, image=photo)
-    drawing_canvas.photo = photo
-
-def next():
-    global counter
-    counter += 1
-    image = Image.open("./font_pngs/" + filelist[counter])
+def next_image():
+    global file_used
+    try:
+        file_used = next(filelist)
+    except:
+        print('conversion complete')
+    image = Image.open(traverse_path + file_used)
     photo = ImageTk.PhotoImage(image)
     drawing_canvas.itemconfigure(image_id, image=photo)
     drawing_canvas.photo = photo
@@ -103,15 +104,11 @@ preview_canvas = tk.Canvas(master = preview_frame, width = 400, height = 400, bg
 preview_canvas.pack()
 preview_frame.pack(side = tk.LEFT)
 
-left_frame = tk.Frame(master = window, relief = relief, height = 400, width = 200, borderwidth = 5)
-left_frame.pack(side = tk.LEFT)
-left_button = tk.Button(master = left_frame, text = 'prev', command = prev)
-left_button.pack()
-
 drawing_frame = tk.Frame(master = window,relief = relief, width = 400, height = 400, borderwidth = 5)
 drawing_canvas = tk.Canvas(master = drawing_frame, width = 400, height = 400,  bd=0, highlightthickness=0)
 # image = Image.open("./font_pngs/1.png")
-photo = ImageTk.PhotoImage(file = "./font_pngs/1.png")
+file_used = next(filelist)
+photo = ImageTk.PhotoImage(file = traverse_path+file_used)
 image_id = drawing_canvas.create_image(200, 200, image=photo)
 
 for i in range(grid_size):
@@ -125,7 +122,7 @@ drawing_frame.pack(side = tk.LEFT)
 
 right_frame = tk.Frame(master = window, relief = relief, height = 400, width = 200, borderwidth = 5)
 right_frame.pack(side = tk.LEFT)
-right_button = tk.Button(master = right_frame, text = 'next', command = next)
+right_button = tk.Button(master = right_frame, text = 'next', command = next_image)
 right_button.pack()
 
 button_frame = tk.Frame(master = window, relief = relief, width = 200, height = 400, borderwidth = 5)

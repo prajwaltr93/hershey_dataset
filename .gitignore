@@ -6,3 +6,5 @@
 **/__pycache__/
 local_dataset/
 test_dir/*
+tools/out_svgs/
+**/font_pngs
