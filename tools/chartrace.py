@@ -15,6 +15,7 @@ items_list = []
 points_list = []
 final_points_list = []
 file_used = 0
+count = 0
 WIDTH = 40
 HEIGHT = 40
 O_X = 20
@@ -24,8 +25,12 @@ m_line = "\tM %s, %s\n"
 l_line = "\tL %s, %s\n"
 
 # helper functions
+def on_close():
+    print("samples completed this run : ",count)
+    window.destroy()
+
 def save_action():
-    global points_list, final_points_list, file_used
+    global points_list, final_points_list, file_used, count
     if len(final_points_list) == 0:
         print(file_used)
         return
@@ -44,7 +49,7 @@ def save_action():
     write_fd.write("' fill='none' stroke='black' />\n")
     write_fd.write("</svg>")
     write_fd.close()
-
+    count += 1
     remove(traverse_path + file_used)
     clear_preview()
     next_image()
@@ -99,6 +104,8 @@ def next_image():
 
 window = tk.Tk()
 window.title("character trace tool")
+# on window close
+window.protocol("WM_DELETE_WINDOW", on_close)
 preview_frame = tk.Frame(master = window, width = 400, height = 400, relief=relief, borderwidth=5)
 preview_canvas = tk.Canvas(master = preview_frame, width = 400, height = 400, bg="white")
 preview_canvas.pack()
