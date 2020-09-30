@@ -7,8 +7,6 @@
     given two points generates intermediate points with range +2. -2
 '''
 
-from drawing_utils import *
-
 def getPoints(x0, y0,x1, y1):
     point_list = []
 
