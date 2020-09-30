@@ -69,7 +69,7 @@ def getCroppedImage(next_xy, current_xy):
     img[next_xy[1], next_xy[0]] = COLOR # open cv and numpy has different axis for x and y
     #crop at current_xy
     slice_begin = getSliceWindow(current_xy)[:-1]
-    img = img[slice_begin[0] : slice_begin[0] + crop_img_size, slice_begin[1] : slice_begin[1] + crop_img_size]
+    img = img[slice_begin[1]: slice_begin[1] + 5,slice_begin[0]:slice_begin[0] + 5]
     return img #return cropped image
 
 def plotImages(*images):
@@ -88,7 +88,7 @@ def getSliceWindow(current_xy):
         generate two variables begin and size for dynamice tensor slicing using tf.slice
     '''
     x, y = current_xy[0], current_xy[1]
-    begin = [y - 2, x - 2 , 0] # zero slice begin for batch size and channel dimension and also axis are interchanged bc : numpy and cv use differenct axis to represent x and y
+    begin = [x - 2, y - 2 , 0] # zero slice begin for batch size and channel dimension
     #size = [5, 5]
     return np.array(begin)
 
@@ -113,13 +113,13 @@ for break_ind in range(len(breaks) - 1):
         svg_string = open(traverse_path+file).read()
         X_target, m_indices = getStrokesIndices(svg_string)
         #loop through all strokes
-        for index in range(len(m_indices) - 1):
+        for index in range(len(m_indices)):
             # handle single strokes
             try:
                 #get current stroke
                 stroke = X_target[m_indices[index] : m_indices[index + 1]]
             except: # out of index exception
-                stroke = X_target[m_indices[index]:-1]
+                stroke = X_target[m_indices[index] : ]
             #all points for given stroke ML,MLL,MLLLL
             points = getAllPoints(stroke)
             env_l = []
@@ -127,8 +127,8 @@ for break_ind in range(len(breaks) - 1):
             touch = 1
             con_img = drawStroke(stroke)
             for ind in range(len(points) - 1):
-                current_xy = points[ind] #crop at this cordinate
-                next_xy = points[ind + 1]
+                current_xy = points[ind] # crop at this coordinate
+                next_xy = points[ind + 1] # mark at this coordinate
                 # inputs
                 ext_inp = getSliceWindow(current_xy)
                 env_img = drawFromPoints(env_l)
