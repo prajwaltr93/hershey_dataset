@@ -63,19 +63,23 @@ dataset = {
 }
 
 def getCroppedImage(next_xy, current_xy):
-    #create image with black background
+    # create image with black background
     img = np.zeros((HEIGHT, WIDTH))
-    #mark point with next_xy cordinates
+    # mark point with next_xy cordinates
     img[next_xy[1], next_xy[0]] = COLOR # open cv and numpy has different axis for x and y
-    #crop at current_xy
+    # crop at current_xy
     slice_begin = getSliceWindow(current_xy)[:-1]
     img = img[slice_begin[1]: slice_begin[1] + 5,slice_begin[0]:slice_begin[0] + 5]
+    # padding to ensure 5*5 image
+    if img.shape != (5,5):
+        rem_x, rem_y = crop_img_size - img.shape[0], crop_img_size - img.shape[1]
+        img = cv.copyMakeBorder(img, 0, rem_x, 0, rem_y, cv.BORDER_CONSTANT, None, 0)
     return img #return cropped image
 
 def plotImages(*images):
-    #plot images for verification
+    # plot images for verification
     ind = images[0]
-    images = images[1] #just for convinience
+    images = images[1] # just for convinience
     fig, axs = plt.subplots(1, len(images))
 
     for image, index in zip(images, range(len(images))):
@@ -89,7 +93,6 @@ def getSliceWindow(current_xy):
     '''
     x, y = current_xy[0], current_xy[1]
     begin = [x - 2, y - 2 , 0] # zero slice begin for batch size and channel dimension
-    #size = [5, 5]
     return np.array(begin)
 
 def pickleLocalDataset(dataset, ind):
