@@ -47,11 +47,13 @@ def getPoints(x0, y0,x1, y1):
     if abs(y1 - y0) < abs(x1 - x0):
         if x0 > x1:
             plotLineLow(x1, y1, x0, y0)
+            point_list = point_list[::-1]
         else:
             plotLineLow(x0, y0, x1, y1)
     else:
         if y0 > y1 :
             plotLineHigh(x1, y1, x0, y0)
+            point_list = point_list[::-1]
         else :
             plotLineHigh(x0, y0, x1, y1)
     if len(point_list) % 2 == 0:
