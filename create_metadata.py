@@ -23,11 +23,14 @@ import pickle as pic
 
 global_dataset_path = "./global_dataset/"
 local_dataset_path = "./local_dataset/"
+prefix_norm = 'data_batch_'
+prefix_minority = 'm_data_batch_'
 
 def help():
     print("$python create_metadata.py <dataset> <train> <validation> <test> \n \
     dataset - L -> Local Dataset \n \
               G -> Global Dataset \n \
+              L1 -> Local Dataset minority class \n \
     <test>, \n \
     <test>, \n \
     <train> - integer number of files to consider to count samples")
@@ -41,6 +44,7 @@ if len(sys.argv) != 5:
 try:
     if sys.argv[1].lower() == 'g':
         path = global_dataset_path
+        prefix = prefix_norm
         metadata = {
                     'train_samples' : 0,
                     'validation_samples' : 0,
@@ -50,7 +54,20 @@ try:
         }
     elif sys.argv[1].lower() == 'l':
         path = local_dataset_path
+        prefix = prefix_norm
         #meta-data structure
+        metadata = {
+            "img_dim" : [HEIGHT, WIDTH],
+            "target_img_dim" : crop_img_size*crop_img_size,
+            "slice_tensor_dim" : 3,
+            "train_samples" : 0,
+            "validation_samples" : 0,
+            "test_samples" : 0
+        }
+    elif sys.argv[1].lower() == 'l1':
+        path = local_dataset_path
+        prefix = prefix_minority
+        # meta-data structure
         metadata = {
             "img_dim" : [HEIGHT, WIDTH],
             "target_img_dim" : crop_img_size*crop_img_size,
@@ -80,9 +97,9 @@ if (train + validation + test) > len(filelist):
     exit(0)
 
 # create metadata structure
-train_files = ["data_batch_"+i.__str__() for i in range(train)] #two files
-validation_files = ["data_batch_"+(train+i).__str__() for i in range(validation)]
-test_files = ["data_batch_"+(train+validation+i).__str__() for i in range(test)]
+train_files = [prefix+i.__str__() for i in range(train)] #two files
+validation_files = [prefix+(train+i).__str__() for i in range(validation)]
+test_files = [prefix+(train+validation+i).__str__() for i in range(test)]
 
 traverse_list = [train_files, validation_files, test_files]
 traverse_values = ['train_samples', 'validation_samples', 'test_samples']
@@ -101,4 +118,4 @@ for key, item in metadata.items():
 # pickle dataset
 fd = open(path + "metadata", 'wb')
 pic.dump(metadata, fd)
-print('metadata created at : ' + path + 'metadata')
+print('metadata created at : ' + path + prefix +'metadata')

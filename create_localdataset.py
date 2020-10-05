@@ -47,11 +47,10 @@ test_dir_path = "./test_dir/local_pics/"
 
 traverse_path = "./font_svgs/"
 local_dataset_path = "./local_dataset/"
-sample_rate = 60
+sample_rate = 100
 len_sample = 0 # counter
-file_cap = 260 # limit files to consider
 _, _, filelist = next(walk(traverse_path))
-
+file_cap = len(filelist) # limit files to consider
 breaks = [i for i in range(0, len(filelist[:file_cap]), sample_rate)]
 
 #dataset structure
@@ -95,8 +94,12 @@ def getSliceWindow(current_xy):
     begin = [x - 2, y - 2 , 0] # zero slice begin for batch size and channel dimension
     return np.array(begin)
 
-def pickleLocalDataset(dataset, ind):
-    out_path = local_dataset_path+"data_batch_"+str(ind)
+def pickleLocalDataset(dataset, ind, collect_minority):
+    # prefix m to indicate dataset with only minority classes touch = 0
+    if collect_minority:
+        out_path = local_dataset_path+"m_data_batch_"+str(ind)
+    else:
+        out_path = local_dataset_path+"data_batch_"+str(ind)
     fd = open(out_path,"wb")
     #convert list to numpy array ie : compatiable with tensorflow data adapter
     dataset['lG_data'] = np.array(dataset['lG_data'])
@@ -111,59 +114,63 @@ def pickleLocalDataset(dataset, ind):
     dataset['lG_touch'] = []
     dataset['lG_croppedimg'] = []
 
-for break_ind in range(len(breaks) - 1):
-    for file in filelist[breaks[break_ind] : breaks[break_ind + 1]]:
-        svg_string = open(traverse_path+file).read()
-        X_target, m_indices = getStrokesIndices(svg_string)
-        #loop through all strokes
-        for index in range(len(m_indices)):
-            # handle single strokes
-            try:
-                #get current stroke
-                stroke = X_target[m_indices[index] : m_indices[index + 1]]
-            except: # out of index exception
-                stroke = X_target[m_indices[index] : ]
-            #all points for given stroke ML,MLL,MLLLL
-            points = getAllPoints(stroke)
-            env_l = []
-            diff_l = points
-            touch = 1
-            con_img = drawStroke(stroke)
-            for ind in range(len(points) - 1):
-                current_xy = points[ind] # crop at this coordinate
-                next_xy = points[ind + 1] # mark at this coordinate
+if __name__ == "__main__":
+    import sys
+    collect_minority = True if len(sys.argv) == 2 else False # collect samples with touch = 0
+    for break_ind in range(len(breaks) - 1):
+        for file in filelist[breaks[break_ind] : breaks[break_ind + 1]]:
+            svg_string = open(traverse_path+file).read()
+            X_target, m_indices = getStrokesIndices(svg_string)
+            #loop through all strokes
+            for index in range(len(m_indices)):
+                # handle single strokes
+                try:
+                    #get current stroke
+                    stroke = X_target[m_indices[index] : m_indices[index + 1]]
+                except: # out of index exception
+                    stroke = X_target[m_indices[index] : ]
+                #all points for given stroke ML,MLL,MLLLL
+                points = getAllPoints(stroke)
+                env_l = []
+                diff_l = points
+                touch = 1
+                con_img = drawStroke(stroke)
+                if not collect_minority:
+                    for ind in range(len(points) - 1):
+                        current_xy = points[ind] # crop at this coordinate
+                        next_xy = points[ind + 1] # mark at this coordinate
+                        # inputs
+                        ext_inp = getSliceWindow(current_xy)
+                        env_img = drawFromPoints(env_l)
+                        diff_img = drawFromPoints(diff_l)
+                        # outputs
+                        next_xy_img = getCroppedImage(next_xy, current_xy) # 5 * 5 image with one point drawn and cropped at current_xy
+                        # plot images for verfication
+                        # plotImages(ind,[con_img, env_img, diff_img, next_xy_img])
+                        # update dataset
+                        dataset['lG_data'].append(np.dstack((env_img, diff_img, con_img)))
+                        dataset['lG_extract'].append(ext_inp)
+                        dataset['lG_croppedimg'].append(np.reshape(next_xy_img, (crop_img_size * crop_img_size)))
+                        dataset['lG_touch'].append(np.array([touch]))
+                        # update env,diffg
+                        env_l = points[0 : ind + 2] # add two points for one complete stroke
+                        diff_l = points[ind + 1 :]
+
+                # update last instance
+                touch = 0
+                env_l = points
+                diff_l = []
+                current_xy = points[-1]
                 # inputs
+                # con_img
                 ext_inp = getSliceWindow(current_xy)
                 env_img = drawFromPoints(env_l)
                 diff_img = drawFromPoints(diff_l)
                 # outputs
-                next_xy_img = getCroppedImage(next_xy, current_xy) # 5 * 5 image with one point drawn and cropped at current_xy
-                # plot images for verfication
-                # plotImages(ind,[con_img, env_img, diff_img, next_xy_img])
-                # update dataset
+                next_xy_img = np.zeros((crop_img_size, crop_img_size)) # 5 * 5 empty image
                 dataset['lG_data'].append(np.dstack((env_img, diff_img, con_img)))
                 dataset['lG_extract'].append(ext_inp)
                 dataset['lG_croppedimg'].append(np.reshape(next_xy_img, (crop_img_size * crop_img_size)))
                 dataset['lG_touch'].append(np.array([touch]))
-                # update env,diffg
-                env_l = points[0 : ind + 2] # add two points for one complete stroke
-                diff_l = points[ind + 1 :]
-
-            #update last instance
-            touch = 0
-            env_l = points
-            diff_l = []
-            current_xy = points[-1]
-            # inputs
-            # con_img
-            ext_inp = getSliceWindow(current_xy)
-            env_img = drawFromPoints(env_l)
-            diff_img = drawFromPoints(diff_l)
-            # outputs
-            next_xy_img = np.zeros((crop_img_size, crop_img_size)) # 5 * 5 empty image
-            dataset['lG_data'].append(np.dstack((env_img, diff_img, con_img)))
-            dataset['lG_extract'].append(ext_inp)
-            dataset['lG_croppedimg'].append(np.reshape(next_xy_img, (crop_img_size * crop_img_size)))
-            dataset['lG_touch'].append(np.array([touch]))
-    #save dataset to disk
-    pickleLocalDataset(dataset,  break_ind)
+        #save dataset to disk
+        pickleLocalDataset(dataset,  break_ind, collect_minority)
