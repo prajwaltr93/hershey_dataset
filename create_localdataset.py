@@ -47,11 +47,7 @@ test_dir_path = "./test_dir/local_pics/"
 
 traverse_path = "./font_svgs/"
 local_dataset_path = "./local_dataset/"
-sample_rate = 100
 len_sample = 0 # counter
-_, _, filelist = next(walk(traverse_path))
-file_cap = len(filelist) # limit files to consider
-breaks = [i for i in range(0, len(filelist[:file_cap]), sample_rate)]
 
 #dataset structure
 dataset = {
@@ -68,7 +64,7 @@ def getCroppedImage(next_xy, current_xy):
     img[next_xy[1], next_xy[0]] = COLOR # open cv and numpy has different axis for x and y
     # crop at current_xy
     slice_begin = getSliceWindow(current_xy)[:-1]
-    img = img[slice_begin[1]: slice_begin[1] + 5,slice_begin[0]:slice_begin[0] + 5]
+    img = img[slice_begin[0]: slice_begin[0] + 5,slice_begin[1]:slice_begin[1] + 5]
     # padding to ensure 5*5 image
     if img.shape != (5,5):
         rem_x, rem_y = crop_img_size - img.shape[0], crop_img_size - img.shape[1]
@@ -91,7 +87,7 @@ def getSliceWindow(current_xy):
         generate two variables begin and size for dynamice tensor slicing using tf.slice
     '''
     x, y = current_xy[0], current_xy[1]
-    begin = [x - 2, y - 2 , 0] # zero slice begin for batch size and channel dimension
+    begin = [y - 2, x - 2 , 0] # zero slice begin for batch size and channel dimension
     return np.array(begin)
 
 def pickleLocalDataset(dataset, ind, collect_minority):
@@ -116,7 +112,11 @@ def pickleLocalDataset(dataset, ind, collect_minority):
 
 if __name__ == "__main__":
     import sys
-    collect_minority = True if len(sys.argv) == 2 else False # collect samples with touch = 0
+    sample_rate = int(sys.argv[2]) if len(sys.argv) == 3 else 100
+    _, _, filelist = next(walk(traverse_path))
+    file_cap = len(filelist) # limit files to consider
+    breaks = [i for i in range(0, len(filelist[:file_cap]), sample_rate)]
+    collect_minority = True if sys.argv[1] == "minority" else False # collect samples with touch = 0
     for break_ind in range(len(breaks) - 1):
         for file in filelist[breaks[break_ind] : breaks[break_ind + 1]]:
             svg_string = open(traverse_path+file).read()
@@ -155,22 +155,22 @@ if __name__ == "__main__":
                         # update env,diffg
                         env_l = points[0 : ind + 2] # add two points for one complete stroke
                         diff_l = points[ind + 1 :]
-
-                # update last instance
-                touch = 0
-                env_l = points
-                diff_l = []
-                current_xy = points[-1]
-                # inputs
-                # con_img
-                ext_inp = getSliceWindow(current_xy)
-                env_img = drawFromPoints(env_l)
-                diff_img = drawFromPoints(diff_l)
-                # outputs
-                next_xy_img = np.zeros((crop_img_size, crop_img_size)) # 5 * 5 empty image
-                dataset['lG_data'].append(np.dstack((env_img, diff_img, con_img)))
-                dataset['lG_extract'].append(ext_inp)
-                dataset['lG_croppedimg'].append(np.reshape(next_xy_img, (crop_img_size * crop_img_size)))
-                dataset['lG_touch'].append(np.array([touch]))
+                if collect_minority:
+                    # update last instance
+                    touch = 0
+                    env_l = points
+                    diff_l = []
+                    current_xy = points[-1]
+                    # inputs
+                    # con_img
+                    ext_inp = getSliceWindow(current_xy)
+                    env_img = drawFromPoints(env_l)
+                    diff_img = drawFromPoints(diff_l)
+                    # outputs
+                    next_xy_img = np.zeros((crop_img_size, crop_img_size)) # 5 * 5 empty image
+                    dataset['lG_data'].append(np.dstack((env_img, diff_img, con_img)))
+                    dataset['lG_extract'].append(ext_inp)
+                    dataset['lG_croppedimg'].append(np.reshape(next_xy_img, (crop_img_size * crop_img_size)))
+                    dataset['lG_touch'].append(np.array([touch]))
         #save dataset to disk
         pickleLocalDataset(dataset,  break_ind, collect_minority)
