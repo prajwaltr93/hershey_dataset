@@ -116,6 +116,6 @@ for key, item in metadata.items():
     print(key, item)
 
 # pickle dataset
-fd = open(path + "metadata", 'wb')
+fd = open(path + prefix + "metadata", 'wb')
 pic.dump(metadata, fd)
 print('metadata created at : ' + path + prefix +'metadata')
