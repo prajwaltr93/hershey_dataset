@@ -96,10 +96,14 @@ if (train + validation + test) > len(filelist):
     print("Found {} data files, requested for {} files".format(len(filelist) - 1, train + test + validation))
     exit(0)
 
-# create metadata structure
-train_files = [prefix+i.__str__() for i in range(train)] #two files
-validation_files = [prefix+(train+i).__str__() for i in range(validation)]
-test_files = [prefix+(train+validation+i).__str__() for i in range(test)]
+if sys.argv[1].lower() == 'g':
+    train_files = ["train_"prefix+i.__str__() for i in range(train)] #two files
+    validation_files = ["validation_"+prefix+(train+i).__str__() for i in range(validation)]
+    test_files = ["test_"+prefix+(train+validation+i).__str__() for i in range(test)]
+if sys.argv[1].lower() == 'l' or sys.argv[1].lower() == 'l1':
+    train_files = [prefix+i.__str__() for i in range(train)] #two files
+    validation_files = [prefix+(train+i).__str__() for i in range(validation)]
+    test_files = [prefix+(train+validation+i).__str__() for i in range(test)]
 
 traverse_list = [train_files, validation_files, test_files]
 traverse_values = ['train_samples', 'validation_samples', 'test_samples']

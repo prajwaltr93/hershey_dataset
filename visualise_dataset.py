@@ -42,7 +42,7 @@ argv = sys.argv
 
 if len(argv) != 2:
     help()
-if argv[1].lower == 'g':
+if argv[1].lower() == 'g':
     data = pic.load(open(global_dataset_path,"rb"), encoding="bytes")
 
     imgs = data['sG_data'][start:end]
