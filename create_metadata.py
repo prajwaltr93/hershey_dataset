@@ -97,7 +97,7 @@ if (train + validation + test) > len(filelist):
     exit(0)
 
 if sys.argv[1].lower() == 'g':
-    train_files = ["train_"prefix+i.__str__() for i in range(train)] #two files
+    train_files = ["train_"+prefix+i.__str__() for i in range(train)] #two files
     validation_files = ["validation_"+prefix+(train+i).__str__() for i in range(validation)]
     test_files = ["test_"+prefix+(train+validation+i).__str__() for i in range(test)]
 if sys.argv[1].lower() == 'l' or sys.argv[1].lower() == 'l1':
